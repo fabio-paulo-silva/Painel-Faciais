@@ -6,511 +6,652 @@
 <title>1.7 – Gestão de Categorias Loja | Faciais</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Manrope',system-ui,sans-serif;background:#f1f5f9;color:#0f172a;font-size:14px;min-height:100vh}
 h1,h2,h3{font-family:'Sora',system-ui,sans-serif}
-button{cursor:pointer;font-family:inherit}
-select{font-family:inherit}
+button,select{cursor:pointer;font-family:inherit}
 
-/* ── Loading / Error states ── */
+/* loading / error */
 #loading-screen{position:fixed;inset:0;background:#f1f5f9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:999}
 .spinner{width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#3DDC84;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-text{font-family:'Sora',sans-serif;font-size:14px;font-weight:600;color:#64748b}
-#error-screen{position:fixed;inset:0;background:#f1f5f9;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999}
-.error-icon{font-size:40px}
-.error-title{font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:#dc2626}
-.error-msg{font-size:13px;color:#64748b;max-width:400px;text-align:center}
+#error-screen{position:fixed;inset:0;background:#f1f5f9;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999;padding:24px;text-align:center}
 #app{display:none}
 
-/* ── Header ── */
-.header{background:linear-gradient(135deg,#1a3a2a 0%,#1d5c38 50%,#166534 100%);padding:24px 32px 20px;position:relative;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.1)}
-.header::before{content:'';position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(61,220,132,.15);filter:blur(40px)}
-.header::after{content:'';position:absolute;left:30%;bottom:-60px;width:180px;height:180px;border-radius:50%;background:rgba(61,220,132,.08);filter:blur(40px)}
-.header-inner{position:relative;max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.header-left{display:flex;align-items:center;gap:14px}
-.header-icon{width:46px;height:46px;border-radius:14px;background:rgba(61,220,132,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.header-icon svg{width:24px;height:24px;stroke:#3DDC84;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.header-eyebrow{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:2px}
-.header-title{font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:#fff;line-height:1.1}
-.header-sub{font-size:12px;color:rgba(255,255,255,.6);margin-top:3px}
-.header-meta{display:flex;gap:10px;flex-wrap:wrap}
-.header-badge{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:8px 14px;color:rgba(255,255,255,.85);font-size:12px;font-weight:600;backdrop-filter:blur(8px)}
-.header-badge svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+/* header */
+.header{background:linear-gradient(135deg,#1a3a2a 0%,#1d5c38 50%,#166534 100%);padding:22px 32px 18px;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(61,220,132,.15);filter:blur(40px);pointer-events:none}
+.header::after{content:'';position:absolute;left:30%;bottom:-60px;width:180px;height:180px;border-radius:50%;background:rgba(61,220,132,.08);filter:blur(40px);pointer-events:none}
+.hdr-inner{position:relative;max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.hdr-left{display:flex;align-items:center;gap:14px}
+.hdr-icon{width:46px;height:46px;border-radius:14px;background:rgba(61,220,132,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hdr-icon svg{width:24px;height:24px;stroke:#3DDC84;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.hdr-eyebrow{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:2px}
+.hdr-title{font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:#fff;line-height:1.1}
+.hdr-sub{font-size:12px;color:rgba(255,255,255,.6);margin-top:3px}
+.hdr-badges{display:flex;gap:8px;flex-wrap:wrap}
+.hdr-badge{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:7px 13px;color:rgba(255,255,255,.85);font-size:12px;font-weight:600;backdrop-filter:blur(8px)}
+.hdr-badge svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
 
-/* ── Filters ── */
-.filters-wrap{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 32px;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.filters-inner{max-width:1280px;margin:0 auto}
-.filters-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.filters-title svg{width:13px;height:13px;stroke:#3DDC84;fill:none;stroke-width:2.5;stroke-linecap:round}
-.filters-row{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}
-.filter-group{display:flex;flex-direction:column;gap:5px}
-.filter-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b}
-.filter-select,.filter-input{height:36px;border:1.5px solid #e2e8f0;border-radius:10px;padding:0 28px 0 10px;font-size:12px;font-weight:600;color:#334155;background:#f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center;outline:none;appearance:none;-webkit-appearance:none;min-width:130px;transition:border-color .15s,box-shadow .15s}
-.filter-input{background-image:none;padding-right:10px}
-.filter-select:focus,.filter-input:focus{border-color:#3DDC84;box-shadow:0 0 0 3px rgba(61,220,132,.15)}
-.filter-divider{width:1px;height:36px;background:#e2e8f0;align-self:flex-end}
-.btn-reset{height:36px;border:1.5px solid #e2e8f0;border-radius:10px;padding:0 14px;font-size:12px;font-weight:700;color:#64748b;background:#f8fafc;display:flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap}
+/* filters */
+.flt-wrap{background:#fff;border-bottom:1px solid #e2e8f0;padding:12px 32px;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.flt-inner{max-width:1280px;margin:0 auto}
+.flt-head{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:9px;display:flex;align-items:center;gap:6px}
+.flt-head svg{width:12px;height:12px;stroke:#3DDC84;fill:none;stroke-width:2.5;stroke-linecap:round}
+.flt-row{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}
+.flt-grp{display:flex;flex-direction:column;gap:4px}
+.flt-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#64748b}
+.flt-sel,.flt-inp{height:34px;border:1.5px solid #e2e8f0;border-radius:9px;padding:0 26px 0 9px;font-size:12px;font-weight:600;color:#334155;background:#f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 9px center;outline:none;appearance:none;min-width:120px;transition:border-color .15s,box-shadow .15s}
+.flt-inp{background-image:none;padding-right:9px;min-width:130px}
+.flt-sel:focus,.flt-inp:focus{border-color:#3DDC84;box-shadow:0 0 0 3px rgba(61,220,132,.14)}
+.flt-div{width:1px;height:34px;background:#e2e8f0;align-self:flex-end}
+.btn-reset{height:34px;border:1.5px solid #e2e8f0;border-radius:9px;padding:0 13px;font-size:12px;font-weight:700;color:#64748b;background:#f8fafc;display:flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap}
 .btn-reset:hover{border-color:#94a3b8;color:#334155;background:#f1f5f9}
 .btn-reset:disabled{opacity:.4;cursor:default}
-.btn-reset svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
-.filters-active-badge{display:none;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;background:rgba(61,220,132,.12);color:#166534;font-size:10px;font-weight:700;margin-left:4px}
+.btn-reset svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.flt-badge{display:none;align-items:center;padding:2px 8px;border-radius:20px;background:rgba(61,220,132,.12);color:#166534;font-size:10px;font-weight:700;margin-left:4px}
 
-/* ── Main ── */
-.main{max-width:1280px;margin:0 auto;padding:24px 32px 64px}
+/* main */
+.main{max-width:1280px;margin:0 auto;padding:20px 32px 64px}
 
-/* ── KPI cards ── */
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px}
-.kpi-card{background:#fff;border-radius:16px;padding:20px 20px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 4px 12px rgba(0,0,0,.04);border:1px solid #f1f5f9;transition:box-shadow .2s,transform .15s}
-.kpi-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.1);transform:translateY(-1px)}
+/* kpi grid */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:12px;margin-bottom:18px}
+.kpi-card{background:#fff;border-radius:14px;padding:18px 18px 14px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 4px 12px rgba(0,0,0,.04);border:1px solid #f1f5f9;transition:box-shadow .2s,transform .15s}
+.kpi-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.09);transform:translateY(-1px)}
 .kpi-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
-.kpi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b}
-.kpi-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.kpi-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.kpi-icon.green{background:rgba(61,220,132,.12);color:#16a34a}
-.kpi-icon.blue{background:rgba(59,130,246,.1);color:#2563eb}
-.kpi-icon.purple{background:rgba(139,92,246,.1);color:#7c3aed}
-.kpi-icon.orange{background:rgba(245,158,11,.1);color:#d97706}
-.kpi-value{font-family:'Sora',sans-serif;font-size:28px;font-weight:800;color:#0f172a;margin-top:10px;line-height:1}
-.kpi-value.success{color:#16a34a}
-.kpi-value.danger{color:#dc2626}
-.kpi-sub{font-size:11px;color:#94a3b8;margin-top:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.kpi-delta{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:700}
-.kpi-delta.up{background:rgba(22,163,74,.1);color:#16a34a}
-.kpi-delta.down{background:rgba(220,38,38,.1);color:#dc2626}
-.kpi-delta.neutral{background:#f1f5f9;color:#64748b}
-.kpi-delta svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round}
+.kpi-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b}
+.kpi-ico{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.kpi-ico svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.kpi-ico.green{background:rgba(61,220,132,.12);color:#16a34a}
+.kpi-ico.blue{background:rgba(59,130,246,.1);color:#2563eb}
+.kpi-ico.purple{background:rgba(139,92,246,.1);color:#7c3aed}
+.kpi-ico.orange{background:rgba(245,158,11,.1);color:#d97706}
+.kpi-val{font-family:'Sora',sans-serif;font-size:26px;font-weight:800;color:#0f172a;margin-top:9px;line-height:1}
+.kpi-val.ok{color:#16a34a}
+.kpi-val.no{color:#dc2626}
+.kpi-sub{font-size:11px;color:#94a3b8;margin-top:7px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.delta{display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:20px;font-size:11px;font-weight:700}
+.delta.up{background:rgba(22,163,74,.1);color:#16a34a}
+.delta.dn{background:rgba(220,38,38,.1);color:#dc2626}
+.delta.nu{background:#f1f5f9;color:#64748b}
+.delta svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round}
 
-/* ── Tab nav ── */
-.tab-nav{background:#fff;border-radius:16px;padding:6px;display:flex;gap:4px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 4px 12px rgba(0,0,0,.04);border:1px solid #f1f5f9;overflow-x:auto}
-.tab-btn{flex:1;min-width:max-content;padding:9px 18px;border-radius:12px;border:none;background:transparent;font-size:12px;font-weight:700;color:#64748b;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s;white-space:nowrap}
-.tab-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* tabs */
+.tab-nav{background:#fff;border-radius:14px;padding:5px;display:flex;gap:3px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 4px 12px rgba(0,0,0,.04);border:1px solid #f1f5f9;overflow-x:auto}
+.tab-btn{flex:1;min-width:max-content;padding:8px 16px;border-radius:10px;border:none;background:transparent;font-size:12px;font-weight:700;color:#64748b;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;white-space:nowrap}
+.tab-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .tab-btn:hover{background:#f1f5f9;color:#334155}
-.tab-btn.active{background:linear-gradient(135deg,#1d5c38,#166534);color:#fff;box-shadow:0 2px 8px rgba(22,101,52,.35)}
+.tab-btn.active{background:linear-gradient(135deg,#1d5c38,#166534);color:#fff;box-shadow:0 2px 8px rgba(22,101,52,.3)}
 .tab-btn.active svg{stroke:#3DDC84}
 
-/* ── Cards ── */
-.card{background:#fff;border-radius:16px;border:1px solid #f1f5f9;box-shadow:0 1px 3px rgba(0,0,0,.06),0 4px 12px rgba(0,0,0,.04);overflow:hidden;margin-bottom:20px}
-.card-header{padding:14px 20px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.card-title{font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px}
-.card-title svg{width:15px;height:15px;stroke:#3DDC84;fill:none;stroke-width:2;stroke-linecap:round}
-.card-count{font-size:11px;font-weight:600;color:#94a3b8}
-.search-input{height:32px;border:1.5px solid #e2e8f0;border-radius:8px;padding:0 10px 0 30px;font-size:12px;color:#334155;background:#f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 9px center;outline:none;transition:border-color .15s}
-.search-input:focus{border-color:#3DDC84;box-shadow:0 0 0 3px rgba(61,220,132,.12)}
+/* cards */
+.card{background:#fff;border-radius:14px;border:1px solid #f1f5f9;box-shadow:0 1px 3px rgba(0,0,0,.06),0 4px 12px rgba(0,0,0,.04);overflow:hidden;margin-bottom:18px}
+.card-hdr{padding:13px 18px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.card-ttl{font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:7px}
+.card-ttl svg{width:14px;height:14px;stroke:#3DDC84;fill:none;stroke-width:2;stroke-linecap:round}
+.card-cnt{font-size:11px;font-weight:600;color:#94a3b8}
+.srch{height:30px;border:1.5px solid #e2e8f0;border-radius:8px;padding:0 9px 0 28px;font-size:12px;color:#334155;background:#f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 8px center;outline:none;transition:border-color .15s}
+.srch:focus{border-color:#3DDC84;box-shadow:0 0 0 3px rgba(61,220,132,.12)}
+.chart-box{padding:18px 18px 10px}
 
-/* ── Tables ── */
+/* grid layouts */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px}
+
+/* tables */
 .tbl-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse}
-thead th{padding:9px 16px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;background:#f8fafc;border-bottom:1px solid #e2e8f0;white-space:nowrap}
-thead th.r{text-align:right}
-thead th.c{text-align:center}
+thead th{padding:8px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;background:#f8fafc;border-bottom:1px solid #e2e8f0;white-space:nowrap}
+th.r{text-align:right} th.c{text-align:center}
 tbody tr{transition:background .1s}
 tbody tr:hover{background:#f8fafc}
-td{padding:10px 16px;font-size:12px;font-weight:500;color:#334155;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+td{padding:9px 14px;font-size:12px;font-weight:500;color:#334155;border-bottom:1px solid #f1f5f9;vertical-align:middle}
 td.r{text-align:right;font-variant-numeric:tabular-nums}
 td.c{text-align:center}
-td.bold{font-weight:700;color:#0f172a}
-.rank-num{font-size:11px;color:#94a3b8;font-weight:600;width:28px}
+td.b{font-weight:700;color:#0f172a}
+.rk{font-size:11px;color:#94a3b8;font-weight:600;width:24px}
 
-/* ── Progress bar ── */
-.prog-wrap{display:flex;align-items:center;gap:8px;width:160px}
-.prog-bg{flex:1;height:7px;background:#e2e8f0;border-radius:4px;position:relative;overflow:visible}
-.prog-fill{height:7px;border-radius:4px}
-.prog-meta-line{position:absolute;top:-2px;height:11px;width:2px;background:#334155;border-radius:1px}
-.prog-pct{font-size:11px;font-weight:700;min-width:42px;text-align:right}
-.prog-pct.ok{color:#16a34a}
-.prog-pct.no{color:#dc2626}
+/* progress bar */
+.pb-wrap{display:flex;align-items:center;gap:7px;min-width:140px}
+.pb-bg{flex:1;height:6px;background:#e2e8f0;border-radius:3px;position:relative;overflow:visible}
+.pb-fill{height:6px;border-radius:3px}
+.pb-meta{position:absolute;top:-2px;height:10px;width:2px;background:#1e293b;border-radius:1px}
+.pb-pct{font-size:11px;font-weight:700;min-width:40px;text-align:right}
+.pb-pct.ok{color:#16a34a} .pb-pct.no{color:#dc2626}
 
-/* ── Status badges ── */
-.badge-ok{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;background:#dcfce7;color:#166534}
-.badge-no{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;background:#fee2e2;color:#991b1b}
-.badge-ok::before{content:'✓ '}
-.badge-no::before{content:'✗ '}
+/* badges */
+.bok{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;background:#dcfce7;color:#166534}
+.bno{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;background:#fee2e2;color:#991b1b}
+.bok::before{content:'✓ '} .bno::before{content:'✗ '}
 
-/* ── Charts ── */
-.chart-container{padding:20px 20px 12px}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.page{display:none}
-.page.active{display:block}
-.footer{text-align:center;padding:32px 0 16px;font-size:11px;color:#94a3b8}
+/* pages */
+.page{display:none} .page.active{display:block}
+.footer{text-align:center;padding:28px 0 14px;font-size:11px;color:#94a3b8}
 
+@media(max-width:900px){.g2,.g3{grid-template-columns:1fr}}
 @media(max-width:768px){
-  .header,.filters-wrap{padding:16px}
-  .main{padding:16px 16px 48px}
-  .grid-2{grid-template-columns:1fr}
+  .header,.flt-wrap{padding:14px 16px}
+  .main{padding:14px 16px 48px}
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
-  .header-title{font-size:18px}
-  .prog-wrap{width:110px}
+  .hdr-title{font-size:18px}
+  .pb-wrap{min-width:100px}
   .tab-btn span{display:none}
 }
 </style>
 </head>
 <body>
 
-<!-- Loading -->
 <div id="loading-screen">
   <div class="spinner"></div>
-  <div class="loading-text">Carregando indicadores...</div>
+  <div class="loading-text">Carregando indicadores…</div>
 </div>
-
-<!-- Error -->
 <div id="error-screen">
-  <div class="error-icon">⚠️</div>
-  <div class="error-title">Não foi possível carregar os dados</div>
-  <div class="error-msg" id="error-msg">Verifique se o arquivo data/dados.json está disponível.</div>
+  <div style="font-size:36px">⚠️</div>
+  <div style="font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:#dc2626">Não foi possível carregar os dados</div>
+  <div id="err-msg" style="font-size:13px;color:#64748b;max-width:400px"></div>
 </div>
 
-<!-- App (hidden until data loads) -->
 <div id="app">
 
+<!-- HEADER -->
 <header class="header">
-  <div class="header-inner">
-    <div class="header-left">
-      <div class="header-icon">
+  <div class="hdr-inner">
+    <div class="hdr-left">
+      <div class="hdr-icon">
         <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
       </div>
       <div>
-        <div class="header-eyebrow">Painel Executivo · Indicador 1.7</div>
-        <h1 class="header-title">Gestão de Categorias Loja</h1>
-        <div class="header-sub">Cuidados Faciais + Botik &nbsp;·&nbsp; Canal: Loja &nbsp;·&nbsp; Meta: 2,2%</div>
+        <div class="hdr-eyebrow">Painel Executivo · Indicador 1.7</div>
+        <h1 class="hdr-title">Gestão de Categorias Loja</h1>
+        <div class="hdr-sub">Cuidados Faciais + Botik &nbsp;·&nbsp; Canal: Loja &nbsp;·&nbsp; Meta: 2,2%</div>
       </div>
     </div>
-    <div class="header-meta">
-      <div class="header-badge">
-        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-        <span>Até: <strong id="hdr-data"></strong></span>
-      </div>
-      <div class="header-badge">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span id="hdr-dias"></span>
-      </div>
+    <div class="hdr-badges">
+      <div class="hdr-badge"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>Até <strong id="hdr-data"></strong></span></div>
+      <div class="hdr-badge"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span id="hdr-dias"></span></div>
     </div>
   </div>
 </header>
 
-<div class="filters-wrap">
-  <div class="filters-inner">
-    <div class="filters-title">
+<!-- FILTERS -->
+<div class="flt-wrap">
+  <div class="flt-inner">
+    <div class="flt-head">
       <svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
       Filtros
-      <span id="filtros-active-badge" class="filters-active-badge">ativos</span>
+      <span id="flt-badge" class="flt-badge">ativos</span>
     </div>
-    <div class="filters-row">
-      <div class="filter-group">
-        <span class="filter-label">Mês</span>
-        <select class="filter-select" id="f-mes" onchange="applyFilters()" style="min-width:115px">
-          <option value="all">Todos</option>
-        </select>
+    <div class="flt-row">
+      <div class="flt-grp"><span class="flt-lbl">Mês</span>
+        <select class="flt-sel" id="f-mes" onchange="apply()" style="min-width:110px"><option value="all">Todos</option></select>
       </div>
-      <div class="filter-divider"></div>
-      <div class="filter-group">
-        <span class="filter-label">De</span>
-        <input type="date" class="filter-input" id="f-dt-ini" onchange="applyFilters()"/>
+      <div class="flt-div"></div>
+      <div class="flt-grp"><span class="flt-lbl">De</span><input type="date" class="flt-inp" id="f-ini" onchange="apply()"/></div>
+      <div class="flt-grp"><span class="flt-lbl">Até</span><input type="date" class="flt-inp" id="f-fim" onchange="apply()"/></div>
+      <div class="flt-div"></div>
+      <div class="flt-grp"><span class="flt-lbl">Praça</span>
+        <select class="flt-sel" id="f-prc" onchange="apply();cascade()" style="min-width:140px"><option value="all">Todas as praças</option></select>
       </div>
-      <div class="filter-group">
-        <span class="filter-label">Até</span>
-        <input type="date" class="filter-input" id="f-dt-fim" onchange="applyFilters()"/>
+      <div class="flt-grp"><span class="flt-lbl">Gestor (GVO)</span>
+        <select class="flt-sel" id="f-ges" onchange="apply();cascade()" style="min-width:160px"><option value="all">Todos os gestores</option></select>
       </div>
-      <div class="filter-divider"></div>
-      <div class="filter-group">
-        <span class="filter-label">Praça</span>
-        <select class="filter-select" id="f-praca" onchange="applyFilters();cascadeFilters()" style="min-width:150px">
-          <option value="all">Todas as praças</option>
-        </select>
+      <div class="flt-grp"><span class="flt-lbl">Loja</span>
+        <select class="flt-sel" id="f-loj" onchange="apply()" style="min-width:170px"><option value="all">Todas as lojas</option></select>
       </div>
-      <div class="filter-group">
-        <span class="filter-label">Gestor (GVO)</span>
-        <select class="filter-select" id="f-gestor" onchange="applyFilters();cascadeFilters()" style="min-width:165px">
-          <option value="all">Todos os gestores</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <span class="filter-label">Loja</span>
-        <select class="filter-select" id="f-loja" onchange="applyFilters()" style="min-width:180px">
-          <option value="all">Todas as lojas</option>
-        </select>
-      </div>
-      <button class="btn-reset" id="btn-reset" onclick="resetFilters()" disabled>
-        <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-        Limpar
+      <button class="btn-reset" id="btn-rst" onclick="reset()" disabled>
+        <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>Limpar
       </button>
     </div>
   </div>
 </div>
 
+<!-- MAIN -->
 <main class="main">
+
+  <!-- KPIs -->
   <div class="kpi-grid" id="kpi-grid"></div>
 
+  <!-- TABS -->
   <nav class="tab-nav">
-    <button class="tab-btn active" onclick="showTab('geral',this)">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      <span>Visão Geral</span>
+    <button class="tab-btn active" onclick="tab('geral',this)">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Visão Geral</span>
     </button>
-    <button class="tab-btn" onclick="showTab('evolucao',this)">
-      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      <span>Evolução</span>
+    <button class="tab-btn" onclick="tab('dia',this)">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>Dia a Dia</span>
     </button>
-    <button class="tab-btn" onclick="showTab('pracas',this)">
-      <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
-      <span>Por Praça</span>
+    <button class="tab-btn" onclick="tab('pracas',this)">
+      <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5"/></svg><span>Por Praça</span>
     </button>
-    <button class="tab-btn" onclick="showTab('lojas',this)">
-      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      <span>Por Loja</span>
+    <button class="tab-btn" onclick="tab('lojas',this)">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Por Loja</span>
     </button>
-    <button class="tab-btn" onclick="showTab('gestores',this)">
-      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      <span>Por Gestor</span>
+    <button class="tab-btn" onclick="tab('gestores',this)">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Por Gestor</span>
     </button>
-    <button class="tab-btn" onclick="showTab('consultores',this)">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
-      <span>Consultores</span>
+    <button class="tab-btn" onclick="tab('consult',this)">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg><span>Consultores</span>
     </button>
   </nav>
 
+  <!-- ── VISÃO GERAL ── -->
   <div id="tab-geral" class="page active">
-    <div class="grid-2">
-      <div class="card"><div class="card-header"><div class="card-title"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7z"/></svg>% Faciais por Praça</div></div><div class="chart-container" id="chart-praca"></div></div>
-      <div class="card"><div class="card-header"><div class="card-title"><svg viewBox="0 0 24 24"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg>Top 10 Lojas</div></div><div class="chart-container" id="chart-lojas-top"></div></div>
-    </div>
+    <!-- linha: grafico de evolucao -->
     <div class="card">
-      <div class="card-header">
-        <div class="card-title"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Todas as Lojas</div>
-        <input type="text" class="search-input" placeholder="Buscar loja..." oninput="filterTbl('tbl-geral',1,this.value)" style="width:210px"/>
+      <div class="card-hdr">
+        <div class="card-ttl"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Evolução Diária — % Faciais</div>
+      </div>
+      <div class="chart-box" id="ch-linha"></div>
+    </div>
+    <!-- barras: praca + top lojas -->
+    <div class="g2">
+      <div class="card">
+        <div class="card-hdr"><div class="card-ttl"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7z"/></svg>% Faciais por Praça</div></div>
+        <div class="chart-box" id="ch-praca"></div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-ttl"><svg viewBox="0 0 24 24"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg>Top 10 Lojas</div></div>
+        <div class="chart-box" id="ch-top10"></div>
+      </div>
+    </div>
+    <!-- tabela geral de lojas -->
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-ttl"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Ranking Lojas</div>
+        <input class="srch" placeholder="Buscar loja…" oninput="srch('tbl-geral',1,this.value)" style="width:200px"/>
       </div>
       <div class="tbl-wrap"><table id="tbl-geral"></table></div>
     </div>
   </div>
 
-  <div id="tab-evolucao" class="page">
-    <div class="card"><div class="card-header"><div class="card-title"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Evolução Diária — % Faciais</div></div><div class="chart-container" id="chart-evolucao"></div></div>
-    <div class="card"><div class="card-header"><div class="card-title"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Resumo por Dia</div></div><div class="tbl-wrap"><table id="tbl-dia"></table></div></div>
-  </div>
-
-  <div id="tab-pracas" class="page">
+  <!-- ── DIA A DIA ── -->
+  <div id="tab-dia" class="page">
+    <!-- KPI diario cards + grafico de linha -->
     <div class="card">
-      <div class="card-header"><div class="card-title"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7z"/></svg>Praças — Ranking</div><span class="card-count" id="cnt-pracas"></span></div>
-      <div class="tbl-wrap"><table id="tbl-pracas"></table></div>
+      <div class="card-hdr"><div class="card-ttl"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Evolução Diária — % Faciais vs Meta 2,2%</div></div>
+      <div class="chart-box" id="ch-linha2"></div>
+    </div>
+    <!-- tabela dia a dia detalhada -->
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-ttl"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Resumo por Dia</div>
+        <span class="card-cnt" id="cnt-dias"></span>
+      </div>
+      <div class="tbl-wrap"><table id="tbl-dia"></table></div>
     </div>
   </div>
 
+  <!-- ── POR PRAÇA ── -->
+  <div id="tab-pracas" class="page">
+    <div class="g2">
+      <div class="card">
+        <div class="card-hdr"><div class="card-ttl"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7z"/></svg>% Faciais por Praça</div></div>
+        <div class="chart-box" id="ch-praca2"></div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-ttl"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Evolução — Praças no período</div></div>
+        <div class="chart-box" id="ch-linha-prc"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-ttl"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7z"/></svg>Ranking por Praça</div>
+        <span class="card-cnt" id="cnt-prc"></span>
+      </div>
+      <div class="tbl-wrap"><table id="tbl-prc"></table></div>
+    </div>
+  </div>
+
+  <!-- ── POR LOJA ── -->
   <div id="tab-lojas" class="page">
     <div class="card">
-      <div class="card-header">
-        <div class="card-title"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Lojas — Ranking</div>
-        <div style="display:flex;align-items:center;gap:10px"><span class="card-count" id="cnt-lojas"></span><input type="text" class="search-input" placeholder="Buscar loja..." oninput="filterTbl('tbl-lojas',1,this.value)" style="width:210px"/></div>
+      <div class="card-hdr">
+        <div class="card-ttl"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Ranking por Loja</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="card-cnt" id="cnt-loj"></span>
+          <input class="srch" placeholder="Buscar loja…" oninput="srch('tbl-loj',1,this.value)" style="width:200px"/>
+        </div>
       </div>
-      <div class="tbl-wrap"><table id="tbl-lojas"></table></div>
+      <div class="tbl-wrap"><table id="tbl-loj"></table></div>
     </div>
   </div>
 
+  <!-- ── POR GESTOR ── -->
   <div id="tab-gestores" class="page">
-    <div class="card">
-      <div class="card-header"><div class="card-title"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Gestores (GVO) — Ranking</div><span class="card-count" id="cnt-gestores"></span></div>
-      <div class="tbl-wrap"><table id="tbl-gestores"></table></div>
-    </div>
-  </div>
-
-  <div id="tab-consultores" class="page">
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>Consultores — Ranking</div>
-        <div style="display:flex;align-items:center;gap:10px"><span class="card-count" id="cnt-consult"></span><input type="text" class="search-input" placeholder="Buscar consultor..." oninput="filterTbl('tbl-consult',1,this.value)" style="width:220px"/></div>
+    <div class="g2">
+      <div class="card">
+        <div class="card-hdr"><div class="card-ttl"><svg viewBox="0 0 24 24"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg>% Faciais por Gestor</div></div>
+        <div class="chart-box" id="ch-ges"></div>
       </div>
-      <div class="tbl-wrap"><table id="tbl-consult"></table></div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-ttl"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Ranking por Gestor</div><span class="card-cnt" id="cnt-ges"></span></div>
+        <div class="tbl-wrap"><table id="tbl-ges"></table></div>
+      </div>
     </div>
   </div>
+
+  <!-- ── CONSULTORES ── -->
+  <div id="tab-consult" class="page">
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-ttl"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>Ranking por Consultor</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="card-cnt" id="cnt-con"></span>
+          <input class="srch" placeholder="Buscar consultor…" oninput="srch('tbl-con',1,this.value)" style="width:210px"/>
+        </div>
+      </div>
+      <div class="tbl-wrap"><table id="tbl-con"></table></div>
+    </div>
+  </div>
+
 </main>
-
 <div class="footer">Gentil Negócios &nbsp;·&nbsp; CIP &nbsp;·&nbsp; Indicador 1.7 – Gestão de Categorias Loja</div>
-
 </div><!-- /app -->
 
 <script>
-let RAW = null;
-let META = 2.2;
-let F = {mes:'all',dtIni:'',dtFim:'',praca:'all',gestor:'all',loja:'all'};
+let D=null, M=2.2;
+let F={mes:'all',ini:'',fim:'',prc:'all',ges:'all',loj:'all'};
 
-// ── Fetch data ────────────────────────────────────────────────────────────────
-fetch('data/dados.json')
-  .then(r => { if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-  .then(data => {
-    RAW  = data;
-    META = data.meta;
-    document.getElementById('loading-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    populateFilters();
-    render();
+// ── fetch ────────────────────────────────────────────────────────────────────
+fetch('data/dados.json?v='+Date.now())
+  .then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
+  .then(d=>{
+    D=d; M=d.meta;
+    document.getElementById('loading-screen').style.display='none';
+    document.getElementById('app').style.display='block';
+    populate(); render();
   })
-  .catch(err => {
-    document.getElementById('loading-screen').style.display = 'none';
-    document.getElementById('error-screen').style.display  = 'flex';
-    document.getElementById('error-msg').textContent = 'Erro: ' + err.message + '. Verifique se data/dados.json existe no repositório.';
+  .catch(e=>{
+    document.getElementById('loading-screen').style.display='none';
+    const es=document.getElementById('error-screen');
+    es.style.display='flex';
+    document.getElementById('err-msg').textContent='Erro: '+e.message;
   });
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-const fmtR = n => 'R$ ' + n.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
-const fmtP = n => n.toFixed(2).replace('.',',') + '%';
-const fmtD = s => s.split('-').reverse().join('/');
+// ── format helpers ────────────────────────────────────────────────────────────
+const fR=n=>'R$ '+n.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+const fP=n=>n.toFixed(2).replace('.',',')+'%';
+const fD=s=>s.split('-').reverse().join('/');
 
-function getFiltered(){
-  let lojas = RAW.lojas.filter(l => {
-    if(F.praca  !== 'all' && l.praca  !== F.praca)  return false;
-    if(F.gestor !== 'all' && l.gestor !== F.gestor) return false;
-    if(F.loja   !== 'all' && l.nome   !== F.loja)   return false;
+// ── compute filtered state ────────────────────────────────────────────────────
+function compute(){
+  // filter lojas
+  const lojas = D.lojas.filter(l=>{
+    if(F.prc!=='all' && l.praca!==F.prc) return false;
+    if(F.ges!=='all' && l.gestor!==F.ges) return false;
+    if(F.loj!=='all' && l.nome!==F.loj)  return false;
     return true;
   });
-  let serie = RAW.serie.filter(s => {
-    if(F.mes !== 'all' && !s.data.startsWith(F.mes)) return false;
-    if(F.dtIni && s.data < F.dtIni) return false;
-    if(F.dtFim && s.data > F.dtFim) return false;
+
+  // filter serie by date/mes
+  const serie = D.serie.filter(s=>{
+    if(F.mes!=='all' && !s.data.startsWith(F.mes)) return false;
+    if(F.ini && s.data<F.ini) return false;
+    if(F.fim && s.data>F.fim) return false;
     return true;
   });
+
+  // re-aggregate praca and gestor from filtered lojas
   const pm={}, gm={};
-  lojas.forEach(l => {
-    const pk=l.praca||'—'; if(!pm[pk]) pm[pk]={nome:pk,total:0,faciais:0}; pm[pk].total+=l.total; pm[pk].faciais+=l.faciais;
-    const gk=l.gestor||'—'; if(!gm[gk]) gm[gk]={nome:gk,total:0,faciais:0}; gm[gk].total+=l.total; gm[gk].faciais+=l.faciais;
+  lojas.forEach(l=>{
+    const pk=l.praca||'—';
+    if(!pm[pk]) pm[pk]={nome:pk,total:0,faciais:0};
+    pm[pk].total+=l.total; pm[pk].faciais+=l.faciais;
+    const gk=l.gestor||'—';
+    if(!gm[gk]) gm[gk]={nome:gk,total:0,faciais:0};
+    gm[gk].total+=l.total; gm[gk].faciais+=l.faciais;
   });
-  const ap = arr => arr.map(x=>({...x,pct:x.total>0?x.faciais/x.total*100:0}));
-  const sd = arr => [...arr].sort((a,b)=>b.pct-a.pct);
-  const pracas   = sd(ap(Object.values(pm)));
-  const gestores = sd(ap(Object.values(gm)));
-  const lojasS   = sd(lojas.map(l=>({...l,pct:l.total>0?l.faciais/l.total*100:0})));
+
+  const addPct=arr=>arr.map(x=>({...x,pct:x.total>0?x.faciais/x.total*100:0}));
+  const desc=arr=>[...arr].sort((a,b)=>b.pct-a.pct);
+
+  const pracas   = desc(addPct(Object.values(pm)));
+  const gestores = desc(addPct(Object.values(gm)));
+  const lojasS   = desc(lojas.map(l=>({...l,pct:l.total>0?l.faciais/l.total*100:0})));
+
   const totalRec  = lojas.reduce((s,l)=>s+l.total,0);
   const facialRec = lojas.reduce((s,l)=>s+l.faciais,0);
-  const pctFacial = totalRec>0?facialRec/totalRec*100:0;
-  return {pracas,gestores,lojas:lojasS,consult:RAW.consultores,totalRec,facialRec,pctFacial,lojasAcima:lojasS.filter(l=>l.pct>=META).length,serie};
+  const pct       = totalRec>0?facialRec/totalRec*100:0;
+
+  return {pracas, gestores, lojas:lojasS, consult:D.consultores,
+          totalRec, facialRec, pct, lojasAcima:lojasS.filter(l=>l.pct>=M).length, serie};
 }
 
+// ── KPI cards ─────────────────────────────────────────────────────────────────
 function buildKPIs(c){
-  const vs=c.pctFacial-META, cls=vs>0.05?'up':vs<-0.05?'down':'neutral';
-  const ico=vs>0.05?'<path d="M18 15l-6-6-6 6"/>':vs<-0.05?'<path d="M6 9l6 6 6-6"/>':'<path d="M5 12h14"/>';
-  const dlt=`<span class="kpi-delta ${cls}"><svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round">${ico}</svg>${vs>=0?'+':''}${vs.toFixed(2).replace('.',',')} p.p.</span>`;
+  const vs=c.pct-M;
+  const dcls=vs>0.05?'up':vs<-0.05?'dn':'nu';
+  const dico=vs>0.05?'<path d="M18 15l-6-6-6 6"/>':vs<-0.05?'<path d="M6 9l6 6 6-6"/>':'<path d="M5 12h14"/>';
+  const dspan=`<span class="delta ${dcls}"><svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round">${dico}</svg>${vs>=0?'+':''}${vs.toFixed(2).replace('.',',')} p.p.</span>`;
+
   const cards=[
-    {lbl:'% Faciais (Real)',val:`<div class="kpi-value ${c.pctFacial>=META?'success':'danger'}">${fmtP(c.pctFacial)}</div>`,sub:dlt+`<span>vs meta ${fmtP(META)}</span>`,icon:'green',ico:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'},
-    {lbl:'Receita Faciais',val:`<div class="kpi-value" style="font-size:22px">${fmtR(c.facialRec)}</div>`,sub:`<span>de ${fmtR(c.totalRec)} total</span>`,icon:'purple',ico:'<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>'},
-    {lbl:'Lojas Acima da Meta',val:`<div class="kpi-value">${c.lojasAcima}<span style="font-size:16px;color:#94a3b8"> / ${c.lojas.length}</span></div>`,sub:`<span>${Math.round(c.lojasAcima/Math.max(c.lojas.length,1)*100)}% das lojas atingiram</span>`,icon:'orange',ico:'<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>'},
-    {lbl:'Período',val:`<div class="kpi-value" style="font-size:20px">${RAW.totalDias} dia${RAW.totalDias>1?'s':''}</div>`,sub:`<span>${RAW.datas.length>1?fmtD(RAW.datas[0])+' a ':''} ${fmtD(RAW.ultimaData)}</span>`,icon:'blue',ico:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'},
+    {l:'% Faciais (Real)', v:`<div class="kpi-val ${c.pct>=M?'ok':'no'}">${fP(c.pct)}</div>`, s:dspan+` <span>vs meta ${fP(M)}</span>`, ic:'green', svg:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'},
+    {l:'Receita Faciais',  v:`<div class="kpi-val" style="font-size:21px">${fR(c.facialRec)}</div>`, s:`<span>de ${fR(c.totalRec)}</span>`, ic:'purple', svg:'<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>'},
+    {l:'Lojas Acima da Meta', v:`<div class="kpi-val">${c.lojasAcima}<span style="font-size:15px;color:#94a3b8"> / ${c.lojas.length}</span></div>`, s:`<span>${Math.round(c.lojasAcima/Math.max(c.lojas.length,1)*100)}% das lojas</span>`, ic:'orange', svg:'<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>'},
+    {l:'Período', v:`<div class="kpi-val" style="font-size:19px">${D.totalDias} dia${D.totalDias>1?'s':''}</div>`, s:`<span>${D.datas.length>1?fD(D.datas[0])+' a ':''} ${fD(D.ultimaData)}</span>`, ic:'blue', svg:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'},
   ];
-  document.getElementById('kpi-grid').innerHTML=cards.map(k=>`<div class="kpi-card"><div class="kpi-top"><div class="kpi-label">${k.lbl}</div><div class="kpi-icon ${k.icon}"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">${k.ico}</svg></div></div>${k.val}<div class="kpi-sub">${k.sub}</div></div>`).join('');
+  document.getElementById('kpi-grid').innerHTML=cards.map(k=>`
+    <div class="kpi-card">
+      <div class="kpi-top">
+        <div class="kpi-lbl">${k.l}</div>
+        <div class="kpi-ico ${k.ic}"><svg viewBox="0 0 24 24" style="width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">${k.svg}</svg></div>
+      </div>
+      ${k.v}
+      <div class="kpi-sub">${k.s}</div>
+    </div>`).join('');
 }
 
-function progBar(pct){
-  const mx=15,f=Math.min(pct/mx*100,100),m=Math.min(META/mx*100,100),col=pct>=META?'#16a34a':'#ef4444',cls=pct>=META?'ok':'no';
-  return `<div class="prog-wrap"><div class="prog-bg"><div class="prog-fill" style="width:${f}%;background:${col}"></div><div class="prog-meta-line" style="left:${m}%"></div></div><span class="prog-pct ${cls}">${fmtP(pct)}</span></div>`;
+// ── progress bar ──────────────────────────────────────────────────────────────
+function pb(pct){
+  const mx=Math.max(15,M*2),f=Math.min(pct/mx*100,100),m=Math.min(M/mx*100,100);
+  const col=pct>=M?'#16a34a':'#ef4444',cls=pct>=M?'ok':'no';
+  return `<div class="pb-wrap"><div class="pb-bg"><div class="pb-fill" style="width:${f}%;background:${col}"></div><div class="pb-meta" style="left:${m}%"></div></div><span class="pb-pct ${cls}">${fP(pct)}</span></div>`;
 }
-function badge(pct){return pct>=META?'<span class="badge-ok">Atingiu</span>':'<span class="badge-no">Abaixo</span>';}
-function thead(cols){return '<thead><tr>'+cols.map(([l,c])=>`<th class="${c||''}">${l}</th>`).join('')+'</tr></thead>';}
+const badge=pct=>pct>=M?'<span class="bok">Atingiu</span>':'<span class="bno">Abaixo</span>';
+const thead=cols=>'<thead><tr>'+cols.map(([l,c])=>`<th class="${c||''}">${l}</th>`).join('')+'</tr></thead>';
+const vsCell=vs=>{const col=vs>=0?'#16a34a':'#dc2626';return `<td class="c" style="color:${col};font-weight:700">${vs>=0?'+':''}${vs.toFixed(2).replace('.',',')} p.p.</td>`;};
 
-function buildLojaTable(id,rows,extra=false){
+// ── tables ────────────────────────────────────────────────────────────────────
+function tblLojas(id,rows,showMeta=false){
   const tb=document.getElementById(id);if(!tb)return;
-  const xh=extra?[['Praça',''],['Gestor','']]:[];
-  tb.innerHTML=thead([['#','c'],['Loja',''],...xh,['Rec. Total','r'],['Rec. Faciais','r'],['% Faciais','c'],['',''],['vs Meta','c'],['Status','c']]);
+  const xh=showMeta?[['Praça',''],['Gestor','']]:[];
+  tb.innerHTML=thead([['#','c'],['Loja',''],...xh,['Rec. Total','r'],['Rec. Faciais','r'],['% Faciais','c'],[''],['vs Meta','c'],['Status','c']]);
   tb.innerHTML+='<tbody>'+rows.map((r,i)=>{
-    const vs=r.pct-META,vc=vs>=0?'#16a34a':'#dc2626',xd=extra?`<td>${r.praca||'—'}</td><td>${r.gestor||'—'}</td>`:'';
-    return `<tr><td class="c rank-num">${i+1}</td><td class="bold">${r.nome}</td>${xd}<td class="r">${fmtR(r.total)}</td><td class="r">${fmtR(r.faciais)}</td><td class="c">${progBar(r.pct)}</td><td></td><td class="c" style="color:${vc};font-weight:700">${vs>=0?'+':''}${vs.toFixed(2).replace('.',',')} p.p.</td><td class="c">${badge(r.pct)}</td></tr>`;
+    const xs=showMeta?`<td>${r.praca||'—'}</td><td>${r.gestor||'—'}</td>`:'';
+    return `<tr><td class="c rk">${i+1}</td><td class="b">${r.nome}</td>${xs}<td class="r">${fR(r.total)}</td><td class="r">${fR(r.faciais)}</td><td>${pb(r.pct)}</td><td></td>${vsCell(r.pct-M)}<td class="c">${badge(r.pct)}</td></tr>`;
   }).join('')+'</tbody>';
 }
-function buildSimpleTable(id,rows){
+function tblSimples(id,rows){
   const tb=document.getElementById(id);if(!tb)return;
-  tb.innerHTML=thead([['#','c'],['Nome',''],['Rec. Total','r'],['Rec. Faciais','r'],['% Faciais','c'],['',''],['vs Meta','c'],['Status','c']]);
-  tb.innerHTML+='<tbody>'+rows.map((r,i)=>{
-    const vs=r.pct-META,vc=vs>=0?'#16a34a':'#dc2626';
-    return `<tr><td class="c rank-num">${i+1}</td><td class="bold">${r.nome}</td><td class="r">${fmtR(r.total)}</td><td class="r">${fmtR(r.faciais)}</td><td class="c">${progBar(r.pct)}</td><td></td><td class="c" style="color:${vc};font-weight:700">${vs>=0?'+':''}${vs.toFixed(2).replace('.',',')} p.p.</td><td class="c">${badge(r.pct)}</td></tr>`;
-  }).join('')+'</tbody>';
+  tb.innerHTML=thead([['#','c'],['Nome',''],['Rec. Total','r'],['Rec. Faciais','r'],['% Faciais','c'],[''],['vs Meta','c'],['Status','c']]);
+  tb.innerHTML+='<tbody>'+rows.map((r,i)=>`<tr><td class="c rk">${i+1}</td><td class="b">${r.nome}</td><td class="r">${fR(r.total)}</td><td class="r">${fR(r.faciais)}</td><td>${pb(r.pct)}</td><td></td>${vsCell(r.pct-M)}<td class="c">${badge(r.pct)}</td></tr>`).join('')+'</tbody>';
 }
-function buildDiaTable(serie){
+function tblDia(serie){
   const tb=document.getElementById('tbl-dia');if(!tb)return;
-  tb.innerHTML=thead([['Data',''],['Rec. Total','r'],['Rec. Faciais','r'],['% Faciais','c'],['',''],['vs Meta','c'],['Status','c']]);
-  tb.innerHTML+='<tbody>'+[...serie].reverse().map(s=>{
-    const vs=s.pct-META,vc=vs>=0?'#16a34a':'#dc2626';
-    return `<tr><td class="bold">${fmtD(s.data)}</td><td class="r">${fmtR(s.total)}</td><td class="r">${fmtR(s.faciais)}</td><td class="c">${progBar(s.pct)}</td><td></td><td class="c" style="color:${vc};font-weight:700">${vs>=0?'+':''}${vs.toFixed(2).replace('.',',')} p.p.</td><td class="c">${badge(s.pct)}</td></tr>`;
-  }).join('')+'</tbody>';
+  tb.innerHTML=thead([['Data','b'],['Rec. Total','r'],['Rec. Faciais','r'],['% Faciais','c'],[''],['vs Meta','c'],['Status','c']]);
+  tb.innerHTML+='<tbody>'+[...serie].reverse().map(s=>`<tr><td class="b">${fD(s.data)}</td><td class="r">${fR(s.total)}</td><td class="r">${fR(s.faciais)}</td><td>${pb(s.pct)}</td><td></td>${vsCell(s.pct-M)}<td class="c">${badge(s.pct)}</td></tr>`).join('')+'</tbody>';
 }
 
-function buildBarChart(cid,rows,maxRows=10){
+// ── bar chart (SVG) ───────────────────────────────────────────────────────────
+function barChart(cid,rows,maxRows=10){
   const el=document.getElementById(cid);if(!el)return;
   const items=rows.slice(0,maxRows);
-  const bH=28,gap=8,lW=145,cW=320,pT=4,h=items.length*(bH+gap)+pT+16;
-  const mx=Math.max(...items.map(x=>x.pct),META*1.5,4);
-  const mX=lW+8+(META/mx)*cW;
-  let bars=items.map((r,i)=>{
-    const y=pT+i*(bH+gap),w=Math.max((r.pct/mx)*cW,2),col=r.pct>=META?'#16a34a':'#ef4444',bg=r.pct>=META?'#dcfce7':'#fee2e2',nm=r.nome.length>20?r.nome.substring(0,19)+'…':r.nome;
-    return `<text x="${lW}" y="${y+bH/2+4}" text-anchor="end" font-size="11" font-family="Manrope,sans-serif" font-weight="600" fill="#334155">${nm}</text><rect x="${lW+8}" y="${y+3}" width="${cW}" height="${bH-6}" rx="5" fill="${bg}"/><rect x="${lW+8}" y="${y+3}" width="${w}" height="${bH-6}" rx="5" fill="${col}" opacity=".85"/><text x="${lW+8+w+5}" y="${y+bH/2+4}" font-size="11" font-family="Sora,sans-serif" font-weight="700" fill="${col}">${fmtP(r.pct)}</text>`;
+  if(!items.length){el.innerHTML='<div style="text-align:center;padding:32px;color:#94a3b8;font-size:12px">Sem dados para exibir</div>';return;}
+  const bH=26,gap=7,lW=148,cW=300,pT=4,h=items.length*(bH+gap)+pT+20;
+  const mx=Math.max(...items.map(x=>x.pct),M*1.5,4);
+  const mX=lW+8+(M/mx)*cW;
+  const bars=items.map((r,i)=>{
+    const y=pT+i*(bH+gap),w=Math.max((r.pct/mx)*cW,2);
+    const col=r.pct>=M?'#16a34a':'#ef4444',bg=r.pct>=M?'#dcfce7':'#fee2e2';
+    const nm=r.nome.length>21?r.nome.substring(0,20)+'…':r.nome;
+    return `<text x="${lW}" y="${y+bH/2+4}" text-anchor="end" font-size="11" font-family="Manrope,sans-serif" font-weight="600" fill="#334155">${nm}</text>
+<rect x="${lW+8}" y="${y+3}" width="${cW}" height="${bH-6}" rx="4" fill="${bg}"/>
+<rect x="${lW+8}" y="${y+3}" width="${w}" height="${bH-6}" rx="4" fill="${col}" opacity=".85"/>
+<text x="${lW+8+w+5}" y="${y+bH/2+4}" font-size="11" font-family="Sora,sans-serif" font-weight="700" fill="${col}">${fP(r.pct)}</text>`;
   }).join('');
-  el.innerHTML=`<svg viewBox="0 0 ${lW+8+cW+60} ${h}" style="width:100%;height:${h}px">${bars}<line x1="${mX}" y1="${pT}" x2="${mX}" y2="${h-16}" stroke="#1d5c38" stroke-width="1.5" stroke-dasharray="4,3" opacity=".7"/><text x="${mX+4}" y="${pT+11}" font-size="10" font-family="Manrope,sans-serif" fill="#1d5c38" font-weight="700">Meta ${fmtP(META)}</text></svg>`;
+  const metaLine=`<line x1="${mX}" y1="${pT}" x2="${mX}" y2="${h-16}" stroke="#1d5c38" stroke-width="1.5" stroke-dasharray="4,3" opacity=".7"/>
+<text x="${mX+4}" y="${pT+11}" font-size="10" font-family="Manrope,sans-serif" fill="#1d5c38" font-weight="700">Meta ${fP(M)}</text>`;
+  el.innerHTML=`<svg viewBox="0 0 ${lW+8+cW+64} ${h}" style="width:100%;height:${h}px">${bars}${metaLine}</svg>`;
 }
-function buildLineChart(serie){
-  const el=document.getElementById('chart-evolucao');if(!el)return;
-  if(serie.length<2){el.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8;font-size:12px">Gráfico disponível a partir de 2 dias de dados</div>';return;}
-  const W=700,H=200,pL=50,pR=24,pT=20,pB=40,cW=W-pL-pR,cH=H-pT-pB;
-  const pcts=serie.map(s=>s.pct),mn=Math.min(...pcts,META*0.8),mx=Math.max(...pcts,META*1.2);
-  const xS=i=>pL+i*(cW/(serie.length-1)),yS=v=>pT+cH-(v-mn)/(mx-mn)*cH,mY=yS(META);
+
+// ── line chart (SVG) ──────────────────────────────────────────────────────────
+function lineChart(cid,serie){
+  const el=document.getElementById(cid);if(!el)return;
+  if(!serie||serie.length<1){el.innerHTML='<div style="text-align:center;padding:32px;color:#94a3b8;font-size:12px">Sem dados para exibir</div>';return;}
+  if(serie.length===1){
+    // single day: show as a simple stat, not a chart
+    const s=serie[0];
+    const col=s.pct>=M?'#16a34a':'#dc2626';
+    el.innerHTML=`<div style="text-align:center;padding:28px 0">
+      <div style="font-family:'Sora',sans-serif;font-size:36px;font-weight:800;color:${col}">${fP(s.pct)}</div>
+      <div style="font-size:12px;color:#94a3b8;margin-top:6px">${fD(s.data)} — 1 dia de dados</div>
+    </div>`;
+    return;
+  }
+  const W=700,H=200,pL=52,pR=28,pT=24,pB=36,cW=W-pL-pR,cH=H-pT-pB;
+  const pcts=serie.map(s=>s.pct);
+  const mn=Math.max(0,Math.min(...pcts,M)-M*0.4);
+  const mx=Math.max(...pcts,M)+M*0.3;
+  const xS=i=>pL+i*(cW/Math.max(serie.length-1,1));
+  const yS=v=>pT+cH-(v-mn)/(mx-mn)*cH;
+  const mY=yS(M);
   const pts=serie.map((s,i)=>`${xS(i)},${yS(s.pct)}`).join(' ');
   const area=`${pL},${pT+cH} `+serie.map((s,i)=>`${xS(i)},${yS(s.pct)}`).join(' ')+` ${xS(serie.length-1)},${pT+cH}`;
-  const dots=serie.map((s,i)=>{const c=s.pct>=META?'#16a34a':'#ef4444';return `<circle cx="${xS(i)}" cy="${yS(s.pct)}" r="4" fill="${c}" stroke="#fff" stroke-width="1.5"><title>${fmtD(s.data)}: ${fmtP(s.pct)}</title></circle>`;}).join('');
-  const skip=Math.ceil(serie.length/8),xlbls=serie.map((s,i)=>i%skip===0?`<text x="${xS(i)}" y="${H-8}" text-anchor="middle" font-size="10" font-family="Manrope,sans-serif" fill="#94a3b8">${fmtD(s.data).substring(0,5)}</text>`:'').join('');
-  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px"><defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#16a34a" stop-opacity=".15"/><stop offset="100%" stop-color="#16a34a" stop-opacity="0"/></linearGradient></defs><polygon points="${area}" fill="url(#ag)"/><polyline points="${pts}" fill="none" stroke="#16a34a" stroke-width="2" stroke-linejoin="round"/>${dots}<line x1="${pL}" y1="${mY}" x2="${W-pR}" y2="${mY}" stroke="#1d5c38" stroke-width="1" stroke-dasharray="5,4" opacity=".6"/><text x="${W-pR+3}" y="${mY+4}" font-size="10" font-family="Manrope,sans-serif" fill="#1d5c38" font-weight="700">Meta</text>${xlbls}</svg>`;
+  const dots=serie.map((s,i)=>{
+    const col=s.pct>=M?'#16a34a':'#ef4444';
+    return `<circle cx="${xS(i)}" cy="${yS(s.pct)}" r="4.5" fill="${col}" stroke="#fff" stroke-width="1.5"><title>${fD(s.data)}: ${fP(s.pct)}</title></circle>`;
+  }).join('');
+  const skip=Math.ceil(serie.length/8);
+  const xlbls=serie.map((s,i)=>i%skip===0?`<text x="${xS(i)}" y="${H-8}" text-anchor="middle" font-size="10" font-family="Manrope,sans-serif" fill="#94a3b8">${fD(s.data).substring(0,5)}</text>`:'').join('');
+  // y-axis labels
+  const ySteps=[mn,(mn+mx)/2,mx].map(v=>`<text x="${pL-6}" y="${yS(v)+4}" text-anchor="end" font-size="10" font-family="Manrope,sans-serif" fill="#94a3b8">${fP(v)}</text>`).join('');
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px">
+  <defs><linearGradient id="ag${cid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#16a34a" stop-opacity=".2"/><stop offset="100%" stop-color="#16a34a" stop-opacity="0"/></linearGradient></defs>
+  <polygon points="${area}" fill="url(#ag${cid})"/>
+  <polyline points="${pts}" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+  ${dots}
+  <line x1="${pL}" y1="${mY}" x2="${W-pR}" y2="${mY}" stroke="#1d5c38" stroke-width="1.5" stroke-dasharray="5,4" opacity=".65"/>
+  <text x="${W-pR+4}" y="${mY+4}" font-size="10" font-family="Manrope,sans-serif" fill="#1d5c38" font-weight="700">Meta ${fP(M)}</text>
+  ${ySteps}${xlbls}
+  </svg>`;
 }
 
-function filterTbl(id,col,q){const lq=q.toLowerCase();document.getElementById(id).querySelectorAll('tbody tr').forEach(r=>{r.style.display=r.cells[col].textContent.toLowerCase().includes(lq)?'':'none';});}
-
-function populateFilters(){
-  const mes=document.getElementById('f-mes');
-  RAW.mesesList.forEach(m=>mes.innerHTML+=`<option value="${m}">${m.split('-').reverse().join('/')}</option>`);
-  document.getElementById('f-praca').innerHTML='<option value="all">Todas as praças</option>';
-  RAW.pracasList.forEach(p=>document.getElementById('f-praca').innerHTML+=`<option value="${p}">${p}</option>`);
-  document.getElementById('f-gestor').innerHTML='<option value="all">Todos os gestores</option>';
-  RAW.gestoresList.forEach(g=>document.getElementById('f-gestor').innerHTML+=`<option value="${g}">${g}</option>`);
-  rebuildLojaOpts();
-  if(RAW.datas.length){document.getElementById('f-dt-ini').value=RAW.datas[0];document.getElementById('f-dt-fim').value=RAW.datas[RAW.datas.length-1];}
+// ── filter: populate dropdowns ────────────────────────────────────────────────
+function populate(){
+  // meses
+  const mel=document.getElementById('f-mes');
+  D.mesesList.forEach(m=>mel.innerHTML+=`<option value="${m}">${m.split('-').reverse().join('/')}</option>`);
+  // pracas
+  D.pracasList.forEach(p=>document.getElementById('f-prc').innerHTML+=`<option value="${p}">${p}</option>`);
+  // gestores
+  D.gestoresList.forEach(g=>document.getElementById('f-ges').innerHTML+=`<option value="${g}">${g}</option>`);
+  // lojas (full list on init)
+  rebuildLojas();
+  // datas
+  if(D.datas.length){
+    document.getElementById('f-ini').value=D.datas[0];
+    document.getElementById('f-fim').value=D.datas[D.datas.length-1];
+  }
 }
-function rebuildLojaOpts(){
-  const el=document.getElementById('f-loja'),prev=el.value;
+
+function rebuildLojas(){
+  const el=document.getElementById('f-loj'),prev=el.value;
   el.innerHTML='<option value="all">Todas as lojas</option>';
-  RAW.lojas.filter(l=>(F.praca==='all'||l.praca===F.praca)&&(F.gestor==='all'||l.gestor===F.gestor)).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR')).forEach(l=>el.innerHTML+=`<option value="${l.nome}">${l.nome}</option>`);
-  if([...el.options].some(o=>o.value===prev))el.value=prev;
+  D.lojas
+    .filter(l=>(F.prc==='all'||l.praca===F.prc)&&(F.ges==='all'||l.gestor===F.ges))
+    .sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'))
+    .forEach(l=>el.innerHTML+=`<option value="${l.nome}">${l.nome}</option>`);
+  if([...el.options].some(o=>o.value===prev)) el.value=prev;
 }
-function cascadeFilters(){F.praca=document.getElementById('f-praca').value;F.gestor=document.getElementById('f-gestor').value;rebuildLojaOpts();}
-function applyFilters(){
-  F={mes:document.getElementById('f-mes').value,dtIni:document.getElementById('f-dt-ini').value,dtFim:document.getElementById('f-dt-fim').value,praca:document.getElementById('f-praca').value,gestor:document.getElementById('f-gestor').value,loja:document.getElementById('f-loja').value};
-  const def=F.mes==='all'&&F.praca==='all'&&F.gestor==='all'&&F.loja==='all';
-  document.getElementById('btn-reset').disabled=def;
-  document.getElementById('filtros-active-badge').style.display=def?'none':'inline-flex';
+
+function cascade(){
+  F.prc=document.getElementById('f-prc').value;
+  F.ges=document.getElementById('f-ges').value;
+  rebuildLojas();
+}
+
+function apply(){
+  F={
+    mes:document.getElementById('f-mes').value,
+    ini:document.getElementById('f-ini').value,
+    fim:document.getElementById('f-fim').value,
+    prc:document.getElementById('f-prc').value,
+    ges:document.getElementById('f-ges').value,
+    loj:document.getElementById('f-loj').value,
+  };
+  const isDefault=F.mes==='all'&&F.prc==='all'&&F.ges==='all'&&F.loj==='all';
+  document.getElementById('btn-rst').disabled=isDefault;
+  document.getElementById('flt-badge').style.display=isDefault?'none':'inline-flex';
   render();
 }
-function resetFilters(){
-  ['f-mes','f-praca','f-gestor','f-loja'].forEach(id=>document.getElementById(id).value='all');
-  if(RAW.datas.length){document.getElementById('f-dt-ini').value=RAW.datas[0];document.getElementById('f-dt-fim').value=RAW.datas[RAW.datas.length-1];}
-  F={mes:'all',dtIni:'',dtFim:'',praca:'all',gestor:'all',loja:'all'};
-  rebuildLojaOpts();document.getElementById('btn-reset').disabled=true;document.getElementById('filtros-active-badge').style.display='none';
+
+function reset(){
+  ['f-mes','f-prc','f-ges','f-loj'].forEach(id=>document.getElementById(id).value='all');
+  if(D.datas.length){document.getElementById('f-ini').value=D.datas[0];document.getElementById('f-fim').value=D.datas[D.datas.length-1];}
+  F={mes:'all',ini:'',fim:'',prc:'all',ges:'all',loj:'all'};
+  rebuildLojas();
+  document.getElementById('btn-rst').disabled=true;
+  document.getElementById('flt-badge').style.display='none';
   render();
 }
-function showTab(id,btn){
+
+// ── tabs ──────────────────────────────────────────────────────────────────────
+function tab(id,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+id).classList.add('active');btn.classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
 }
+
+// ── search ────────────────────────────────────────────────────────────────────
+function srch(id,col,q){
+  const lq=q.toLowerCase();
+  document.getElementById(id).querySelectorAll('tbody tr')
+    .forEach(r=>r.style.display=r.cells[col].textContent.toLowerCase().includes(lq)?'':'none');
+}
+
+// ── render ────────────────────────────────────────────────────────────────────
 function render(){
-  const c=getFiltered();
+  const c=compute();
+
+  // KPIs
   buildKPIs(c);
-  buildBarChart('chart-praca',c.pracas);
-  buildBarChart('chart-lojas-top',c.lojas.slice(0,10));
-  buildLineChart(c.serie);
-  buildLojaTable('tbl-geral',c.lojas);
-  buildLojaTable('tbl-lojas',c.lojas,true);
-  buildSimpleTable('tbl-pracas',c.pracas);
-  buildSimpleTable('tbl-gestores',c.gestores);
-  buildSimpleTable('tbl-consult',c.consult);
-  buildDiaTable(c.serie);
-  document.getElementById('cnt-pracas').textContent=c.pracas.length+' praças';
-  document.getElementById('cnt-gestores').textContent=c.gestores.length+' gestores';
-  document.getElementById('cnt-lojas').textContent=c.lojas.length+' lojas';
-  document.getElementById('cnt-consult').textContent=c.consult.length+' consultores';
-  document.getElementById('hdr-data').textContent=RAW.dataBase;
-  document.getElementById('hdr-dias').textContent=RAW.totalDias+' dia'+(RAW.totalDias>1?'s de dados':'');
+
+  // header badges
+  document.getElementById('hdr-data').textContent=D.dataBase;
+  document.getElementById('hdr-dias').textContent=D.totalDias+' dia'+(D.totalDias>1?'s de dados':'');
+
+  // Visão Geral
+  lineChart('ch-linha', c.serie);
+  barChart('ch-praca',  c.pracas);
+  barChart('ch-top10',  c.lojas.slice(0,10));
+  tblLojas('tbl-geral', c.lojas);
+
+  // Dia a Dia
+  lineChart('ch-linha2', c.serie);
+  tblDia(c.serie);
+  document.getElementById('cnt-dias').textContent=c.serie.length+' dias';
+
+  // Por Praça
+  barChart('ch-praca2', c.pracas);
+  lineChart('ch-linha-prc', c.serie);   // evolução geral no contexto praça filtrada
+  tblSimples('tbl-prc', c.pracas);
+  document.getElementById('cnt-prc').textContent=c.pracas.length+' praças';
+
+  // Por Loja
+  tblLojas('tbl-loj', c.lojas, true);
+  document.getElementById('cnt-loj').textContent=c.lojas.length+' lojas';
+
+  // Por Gestor
+  barChart('ch-ges', c.gestores, 15);
+  tblSimples('tbl-ges', c.gestores);
+  document.getElementById('cnt-ges').textContent=c.gestores.length+' gestores';
+
+  // Consultores
+  tblSimples('tbl-con', c.consult);
+  document.getElementById('cnt-con').textContent=c.consult.length+' consultores';
 }
 </script>
 </body>
