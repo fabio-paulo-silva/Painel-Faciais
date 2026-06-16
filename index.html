@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1.7 – Gestão de Categorias Loja | Indicador Faciais</title>
+<style>
+  :root {
+    --azul-esc:  #1F3864;
+    --azul-med:  #2E75B6;
+    --azul-cl:   #DAE3F3;
+    --verde:     #375623;
+    --verde-cl:  #E2EFDA;
+    --verde-mid: #70AD47;
+    --verm:      #9C0006;
+    --verm-cl:   #FFC7CE;
+    --verm-mid:  #FF0000;
+    --cinza:     #F2F2F2;
+    --cinza-b:   #D9D9D9;
+    --branco:    #FFFFFF;
+    --laranja:   #ED7D31;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #EEF2F7; color: #222; font-size: 13px; }
+
+  /* ── header ── */
+  .header {
+    background: var(--azul-esc);
+    padding: 20px 32px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .header-left h1 { color: #fff; font-size: 20px; font-weight: 700; letter-spacing: .3px; }
+  .header-left p  { color: #BDD7EE; font-size: 12px; margin-top: 4px; }
+  .badge {
+    background: var(--azul-med); color: #fff;
+    padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
+  }
+
+  /* ── nav tabs ── */
+  .tabs { display: flex; gap: 0; background: var(--azul-esc); padding: 0 32px; border-top: 1px solid #2E4A7A; }
+  .tab {
+    padding: 10px 20px; cursor: pointer; color: #BDD7EE;
+    font-size: 12px; font-weight: 600; border-bottom: 3px solid transparent;
+    transition: all .2s; letter-spacing: .4px; text-transform: uppercase;
+  }
+  .tab:hover { color: #fff; }
+  .tab.active { color: #fff; border-bottom-color: var(--laranja); }
+
+  /* ── main ── */
+  .main { padding: 24px 32px; max-width: 1400px; margin: 0 auto; }
+
+  /* ── page ── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── KPI cards ── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px; margin-bottom: 28px;
+  }
+  .kpi-card {
+    background: var(--azul-esc); border-radius: 8px;
+    padding: 18px 16px 14px; text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,.12);
+  }
+  .kpi-card.verde  { background: #1e4620; }
+  .kpi-card.verm   { background: #7a0000; }
+  .kpi-card.laranj { background: #7a3d00; }
+  .kpi-val  { color: #fff; font-size: 22px; font-weight: 700; line-height: 1.2; }
+  .kpi-lbl  { color: #BDD7EE; font-size: 10px; margin-top: 5px; text-transform: uppercase; letter-spacing: .5px; }
+
+  /* ── section title ── */
+  .section-title {
+    background: var(--azul-esc); color: #fff;
+    padding: 8px 16px; border-radius: 6px 6px 0 0;
+    font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .section-title span { font-weight: 400; color: #BDD7EE; font-size: 11px; }
+
+  /* ── search box ── */
+  .search-wrap { background: #fff; padding: 8px 12px; border-bottom: 1px solid var(--cinza-b); }
+  .search-wrap input {
+    width: 100%; max-width: 360px; border: 1px solid var(--cinza-b);
+    border-radius: 4px; padding: 5px 10px; font-size: 12px; outline: none;
+  }
+  .search-wrap input:focus { border-color: var(--azul-med); }
+
+  /* ── tables ── */
+  .table-wrap { background: #fff; border-radius: 0 0 8px 8px; overflow: hidden; margin-bottom: 28px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    background: var(--azul-med); color: #fff;
+    padding: 9px 12px; text-align: center;
+    font-size: 11px; font-weight: 700; letter-spacing: .3px; white-space: nowrap;
+  }
+  thead th:first-child { text-align: left; }
+  tbody tr { transition: background .1s; }
+  tbody tr:nth-child(even) { background: var(--cinza); }
+  tbody tr:hover { background: var(--azul-cl); }
+  td { padding: 7px 12px; border-bottom: 1px solid #eee; font-size: 12px; }
+  td.name { text-align: left; font-weight: 500; }
+  td.num  { text-align: right; font-variant-numeric: tabular-nums; }
+  td.cen  { text-align: center; }
+
+  /* ── bar ── */
+  .bar-wrap { width: 120px; background: #e8e8e8; border-radius: 3px; height: 8px; display: inline-block; vertical-align: middle; position: relative; }
+  .bar-fill { height: 8px; border-radius: 3px; }
+  .bar-meta { position: absolute; top: -1px; height: 10px; width: 2px; background: var(--azul-esc); border-radius: 1px; }
+
+  /* ── badges ── */
+  .badge-ok  { background: var(--verde-cl); color: var(--verde); font-weight: 700; padding: 2px 8px; border-radius: 10px; font-size: 11px; white-space: nowrap; }
+  .badge-no  { background: var(--verm-cl);  color: var(--verm);  font-weight: 700; padding: 2px 8px; border-radius: 10px; font-size: 11px; white-space: nowrap; }
+  .pct-ok { color: var(--verde); font-weight: 700; }
+  .pct-no { color: var(--verm);  font-weight: 700; }
+
+  /* ── vs meta ── */
+  .vs-ok { color: var(--verde-mid); font-weight: 700; }
+  .vs-no { color: var(--verm-mid);  font-weight: 700; }
+
+  /* ── gauge chart ── */
+  .gauge-wrap { display: flex; justify-content: center; margin-bottom: 24px; }
+  .gauge-svg { overflow: visible; }
+
+  /* ── footer ── */
+  .footer { text-align: center; color: #aaa; font-size: 11px; padding: 20px 0 32px; }
+
+  /* ── responsive ── */
+  @media(max-width: 700px) {
+    .main { padding: 16px; }
+    .header { padding: 16px; flex-direction: column; gap: 8px; }
+    .tabs { padding: 0 8px; overflow-x: auto; }
+    .kpi-grid { grid-template-columns: repeat(2,1fr); }
+    .bar-wrap { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>1.7 – Gestão de Categorias Loja</h1>
+    <p>Cuidados Faciais + Botik &nbsp;|&nbsp; Canal: Loja &nbsp;|&nbsp; Meta: 2,2% &nbsp;|&nbsp; Base: <span id="dataBase"></span></p>
+  </div>
+  <div class="badge">Faciais</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showPage('resumo',this)">Resumo</div>
+  <div class="tab" onclick="showPage('pracas',this)">Por Praça</div>
+  <div class="tab" onclick="showPage('gestores',this)">Por Gestor</div>
+  <div class="tab" onclick="showPage('lojas',this)">Por Loja</div>
+  <div class="tab" onclick="showPage('consultores',this)">Por Consultor</div>
+</div>
+
+<div class="main">
+
+  <!-- ══ RESUMO ══ -->
+  <div id="page-resumo" class="page active">
+
+    <div class="kpi-grid" id="kpi-grid"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px" id="grid-resumo-tables">
+
+      <div>
+        <div class="section-title">Praça <span>% Faciais</span></div>
+        <div class="table-wrap" style="border-radius:0 0 8px 8px">
+          <table id="tbl-praca-resumo"></table>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">Gestor (GVO) <span>% Faciais</span></div>
+        <div class="table-wrap" style="border-radius:0 0 8px 8px">
+          <table id="tbl-gestor-resumo"></table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ PRAÇAS ══ -->
+  <div id="page-pracas" class="page">
+    <div class="section-title">Praças – Ranking por % Faciais <span id="praca-count"></span></div>
+    <div class="table-wrap">
+      <table id="tbl-pracas"></table>
+    </div>
+  </div>
+
+  <!-- ══ GESTORES ══ -->
+  <div id="page-gestores" class="page">
+    <div class="section-title">Gestores (GVO) – Ranking por % Faciais <span id="gestor-count"></span></div>
+    <div class="table-wrap">
+      <div class="search-wrap"><input type="text" placeholder="Buscar gestor..." oninput="filterTable('tbl-gestores',this.value)"></div>
+      <table id="tbl-gestores"></table>
+    </div>
+  </div>
+
+  <!-- ══ LOJAS ══ -->
+  <div id="page-lojas" class="page">
+    <div class="section-title">Lojas – Ranking por % Faciais <span id="loja-count"></span></div>
+    <div class="table-wrap">
+      <div class="search-wrap"><input type="text" placeholder="Buscar loja..." oninput="filterTable('tbl-lojas',this.value)"></div>
+      <table id="tbl-lojas"></table>
+    </div>
+  </div>
+
+  <!-- ══ CONSULTORES ══ -->
+  <div id="page-consultores" class="page">
+    <div class="section-title">Consultores – Ranking por % Faciais <span id="consultor-count"></span></div>
+    <div class="table-wrap">
+      <div class="search-wrap"><input type="text" placeholder="Buscar consultor..." oninput="filterTable('tbl-consultores',this.value)"></div>
+      <table id="tbl-consultores"></table>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<div class="footer">Gentil Negócios &nbsp;·&nbsp; CIP &nbsp;·&nbsp; Indicador 1.7 – Gestão de Categorias Loja</div>
+
+<script>
+const D = {"meta": 2.1999999999999997, "dataBase": "16/05/2026", "kpis": {"totalRec": 279538.04, "facialRec": 5245.56, "pctFacial": 1.88, "lojasAcima": 21, "lojasTotal": 104}, "pracas": [{"nome": "NATAL", "total": 50534.54, "faciais": 1603.82, "pct": 3.17}, {"nome": "OMA", "total": 23488.9, "faciais": 596.87, "pct": 2.54}, {"nome": "SÃO LUÍS", "total": 99306.35, "faciais": 2072.27, "pct": 2.09}, {"nome": "MOSSORÓ", "total": 14143.6, "faciais": 208.8, "pct": 1.48}, {"nome": "LITORAL", "total": 24665.84, "faciais": 362.97, "pct": 1.47}, {"nome": "PARAÍBA", "total": 27484.78, "faciais": 211.31, "pct": 0.77}, {"nome": "OCE", "total": 34223.4, "faciais": 189.51, "pct": 0.55}, {"nome": "RN SUL", "total": 5690.63, "faciais": 0.01, "pct": 0.0}], "gestores": [{"nome": "Marcos Dutra", "total": 7291.76, "faciais": 596.87, "pct": 8.19}, {"nome": "Ysabelle Noronha", "total": 3200.97, "faciais": 208.8, "pct": 6.52}, {"nome": "Larissa Nascimento", "total": 7116.55, "faciais": 392.6, "pct": 5.52}, {"nome": "Aline Melo", "total": 7749.67, "faciais": 352.33, "pct": 4.55}, {"nome": "Karina Altiva", "total": 14141.62, "faciais": 637.41, "pct": 4.51}, {"nome": "Glaucia Gois", "total": 9374.65, "faciais": 387.88, "pct": 4.14}, {"nome": "Carla Andrea", "total": 8349.37, "faciais": 245.17, "pct": 2.94}, {"nome": "Lucas Matheus", "total": 16843.75, "faciais": 419.78, "pct": 2.49}, {"nome": "Jhennycka Silva", "total": 5159.79, "faciais": 119.51, "pct": 2.32}, {"nome": "Paula Pereira", "total": 15857.99, "faciais": 351.5, "pct": 2.22}, {"nome": "Thiciane Melo", "total": 20958.86, "faciais": 445.69, "pct": 2.13}, {"nome": "Larissa Goes", "total": 13975.42, "faciais": 287.06, "pct": 2.05}, {"nome": "Érika Meirelles", "total": 14044.78, "faciais": 239.43, "pct": 1.7}, {"nome": "Zélia Alves", "total": 6490.79, "faciais": 67.9, "pct": 1.05}, {"nome": "Padã Feitosa", "total": 23086.74, "faciais": 211.31, "pct": 0.92}, {"nome": "Alessandra Ferreira", "total": 16316.47, "faciais": 117.8, "pct": 0.72}, {"nome": "Evanderson Teixeira", "total": 11110.37, "faciais": 74.9, "pct": 0.67}, {"nome": "Edilene Gomes", "total": 7581.57, "faciais": 46.71, "pct": 0.62}, {"nome": "Thais Soares", "total": 19341.92, "faciais": 42.9, "pct": 0.22}, {"nome": "Edson Mendonça", "total": 10758.74, "faciais": 0.0, "pct": 0.0}, {"nome": "Francisco Pereira", "total": 5438.4, "faciais": 0.0, "pct": 0.0}, {"nome": "Gabriel Figueiredo", "total": 4398.04, "faciais": 0.0, "pct": 0.0}, {"nome": "Ismênia de Gois", "total": 5275.89, "faciais": 0.0, "pct": 0.0}, {"nome": "Lorena Silva", "total": 2801.68, "faciais": 0.01, "pct": 0.0}, {"nome": "Luana Edwirgens", "total": 4588.23, "faciais": 0.0, "pct": 0.0}, {"nome": "Lucas Medeiros", "total": 2888.95, "faciais": 0.0, "pct": 0.0}, {"nome": "Renison Santos", "total": 4452.44, "faciais": 0.0, "pct": 0.0}, {"nome": "Ticiane Marques", "total": 5876.67, "faciais": 0.0, "pct": 0.0}, {"nome": "Vanessa de Abreu", "total": 5065.96, "faciais": 0.0, "pct": 0.0}], "lojas": [{"nome": "PASSA E FICA", "total": 0.02, "faciais": 0.01, "pct": 50.0}, {"nome": "SUPERMERCADO REBOUÇAS ALBERTO MARANHÃO", "total": 1611.6, "faciais": 208.8, "pct": 12.96}, {"nome": "ZÉ DOCA", "total": 4794.14, "faciais": 596.87, "pct": 12.45}, {"nome": "NATAL SHOPPING", "total": 1249.21, "faciais": 145.52, "pct": 11.65}, {"nome": "SALGADO FILHO", "total": 2919.02, "faciais": 242.36, "pct": 8.3}, {"nome": "NORDESTAO PT NEGRA", "total": 2136.17, "faciais": 137.8, "pct": 6.45}, {"nome": "FERREIRA COSTA", "total": 4127.53, "faciais": 254.8, "pct": 6.17}, {"nome": "POTENGI", "total": 3534.81, "faciais": 199.26, "pct": 5.64}, {"nome": "SHOPPING DA ILHA", "total": 6037.55, "faciais": 332.28, "pct": 5.5}, {"nome": "TOUROS", "total": 2147.27, "faciais": 109.77, "pct": 5.11}, {"nome": "COHAB", "total": 8708.76, "faciais": 419.78, "pct": 4.82}, {"nome": "SÃO LUÍS SHOPPING", "total": 6459.56, "faciais": 299.6, "pct": 4.64}, {"nome": "RUA GRANDE II", "total": 6644.95, "faciais": 305.13, "pct": 4.59}, {"nome": "ACARAÚ", "total": 1666.58, "faciais": 74.9, "pct": 4.49}, {"nome": "SÃO GONÇALO IGAPO", "total": 3314.26, "faciais": 135.4, "pct": 4.09}, {"nome": "NORTE SHOPPING", "total": 3748.04, "faciais": 153.07, "pct": 4.08}, {"nome": "JOAO PAULO", "total": 5969.52, "faciais": 221.54, "pct": 3.71}, {"nome": "SHOPPING 10", "total": 12145.17, "faciais": 351.5, "pct": 2.89}, {"nome": "MIDWAY L1", "total": 4214.09, "faciais": 119.51, "pct": 2.84}, {"nome": "MATEUS COHAMA", "total": 5089.73, "faciais": 134.92, "pct": 2.65}, {"nome": "VENÂNCIO NEIVA", "total": 7169.65, "faciais": 169.95, "pct": 2.37}, {"nome": "COHATRAC", "total": 6297.46, "faciais": 104.51, "pct": 1.66}, {"nome": "PARACURU", "total": 3437.04, "faciais": 46.71, "pct": 1.36}, {"nome": "GUAJAJARAS", "total": 7212.05, "faciais": 97.33, "pct": 1.35}, {"nome": "MACAU", "total": 5651.67, "faciais": 74.9, "pct": 1.33}, {"nome": "SHOPPING DO AUTOMÓVEL", "total": 3775.24, "faciais": 48.76, "pct": 1.29}, {"nome": "CAMOCIM", "total": 5938.15, "faciais": 67.9, "pct": 1.14}, {"nome": "SHOPPING RIO ANIL", "total": 6138.37, "faciais": 65.52, "pct": 1.07}, {"nome": "MACIEL PINHEIRO", "total": 6167.0, "faciais": 41.36, "pct": 0.67}, {"nome": "SÃO PAULO DO POTENGI", "total": 7306.21, "faciais": 42.9, "pct": 0.59}, {"nome": "RUA GRANDE", "total": 8011.94, "faciais": 42.9, "pct": 0.54}, {"nome": "AMONTADA", "total": 546.97, "faciais": 0.0, "pct": 0.0}, {"nome": "ANJO DA GUARDA", "total": 4582.81, "faciais": 0.0, "pct": 0.0}, {"nome": "AREIA BRANCA", "total": 398.23, "faciais": 0.0, "pct": 0.0}, {"nome": "ASSAÍ CAMPINA GRANDE", "total": 560.01, "faciais": 0.0, "pct": 0.0}, {"nome": "BREJINHO", "total": 1491.57, "faciais": 0.0, "pct": 0.0}, {"nome": "CANGUARETAMA", "total": 707.31, "faciais": 0.0, "pct": 0.0}, {"nome": "CARREFOUR", "total": 2231.69, "faciais": 0.0, "pct": 0.0}, {"nome": "CARREFOUR MOSSORÓ", "total": 1052.28, "faciais": 0.0, "pct": 0.0}, {"nome": "CARUTAPERA", "total": 528.96, "faciais": 0.0, "pct": 0.0}, {"nome": "CCAB", "total": 466.82, "faciais": 0.0, "pct": 0.0}, {"nome": "CEARÁ-MIRIM", "total": 1295.8, "faciais": 0.0, "pct": 0.0}, {"nome": "CENTRO MOSSORÓ", "total": 5478.44, "faciais": 0.0, "pct": 0.0}, {"nome": "CIDADE ATACADAO", "total": 1090.34, "faciais": 0.0, "pct": 0.0}, {"nome": "CIDADE JARDIM", "total": 164.91, "faciais": 0.0, "pct": 0.0}, {"nome": "CIDADE OPERARIA", "total": 3512.01, "faciais": 0.0, "pct": 0.0}, {"nome": "CIDADE VERDE", "total": 1072.03, "faciais": 0.0, "pct": 0.0}, {"nome": "CONDE", "total": 1156.2, "faciais": 0.0, "pct": 0.0}, {"nome": "CONTAINER ASSAÍ", "total": 60.84, "faciais": 0.0, "pct": 0.0}, {"nome": "CONTAINER SANTA INÊS", "total": 2255.94, "faciais": 0.0, "pct": 0.0}, {"nome": "CURVA DO NOVENTA", "total": 1661.66, "faciais": 0.0, "pct": 0.0}, {"nome": "EXTREMOZ", "total": 1768.63, "faciais": 0.0, "pct": 0.0}, {"nome": "GOIANINHA", "total": 690.07, "faciais": 0.0, "pct": 0.0}, {"nome": "GOLDEN SHOPPING", "total": 1555.52, "faciais": 0.0, "pct": 0.0}, {"nome": "GOV. NUNES FREIRE", "total": 1961.57, "faciais": 0.0, "pct": 0.0}, {"nome": "GRANJA", "total": 552.64, "faciais": 0.0, "pct": 0.0}, {"nome": "IDEAL SUPERMERCADO", "total": 2431.28, "faciais": 0.0, "pct": 0.0}, {"nome": "INGÁ", "total": 1012.04, "faciais": 0.0, "pct": 0.0}, {"nome": "ITABAIANA", "total": 2068.85, "faciais": 0.0, "pct": 0.0}, {"nome": "ITAPAJÉ", "total": 772.53, "faciais": 0.0, "pct": 0.0}, {"nome": "ITAPIPOCA", "total": 2856.17, "faciais": 0.0, "pct": 0.0}, {"nome": "ITAREMA", "total": 767.45, "faciais": 0.0, "pct": 0.0}, {"nome": "JIJOCA", "total": 7377.93, "faciais": 0.0, "pct": 0.0}, {"nome": "JOÃO CÂMARA", "total": 2062.79, "faciais": 0.0, "pct": 0.0}, {"nome": "LAGOA SECA", "total": 160.95, "faciais": 0.0, "pct": 0.0}, {"nome": "MALVINAS", "total": 1023.47, "faciais": 0.0, "pct": 0.0}, {"nome": "MARACAÇUME", "total": 2027.05, "faciais": 0.0, "pct": 0.0}, {"nome": "MARCO", "total": 1298.41, "faciais": 0.0, "pct": 0.0}, {"nome": "MARIA LACERDA", "total": 588.15, "faciais": 0.0, "pct": 0.0}, {"nome": "MATEUS UBATUBA", "total": 2657.59, "faciais": 0.0, "pct": 0.0}, {"nome": "MAXXI ATACADO", "total": 1384.02, "faciais": 0.0, "pct": 0.0}, {"nome": "MIDWAY L3", "total": 646.4, "faciais": 0.0, "pct": 0.0}, {"nome": "NOVA CRUZ", "total": 942.97, "faciais": 0.0, "pct": 0.0}, {"nome": "PARAIPABA", "total": 806.81, "faciais": 0.0, "pct": 0.0}, {"nome": "PARNAMIRIM", "total": 4116.08, "faciais": 0.0, "pct": 0.0}, {"nome": "PARTAGE CAMPINA GRANDE", "total": 2424.25, "faciais": 0.0, "pct": 0.0}, {"nome": "PARTAGE MOSSORÓ", "total": 2727.06, "faciais": 0.0, "pct": 0.0}, {"nome": "PECÉM", "total": 1915.32, "faciais": 0.0, "pct": 0.0}, {"nome": "PENTECOSTE", "total": 1235.88, "faciais": 0.0, "pct": 0.0}, {"nome": "PINDARÉ-MIRIM", "total": 855.8, "faciais": 0.0, "pct": 0.0}, {"nome": "PRAIA SHOPPING", "total": 687.94, "faciais": 0.0, "pct": 0.0}, {"nome": "PÁTIO NORTE", "total": 5579.49, "faciais": 0.0, "pct": 0.0}, {"nome": "QDB MIDWAY", "total": 299.3, "faciais": 0.0, "pct": 0.0}, {"nome": "QDB SHOPPING DA ILHA", "total": 165.7, "faciais": 0.0, "pct": 0.0}, {"nome": "QUIOSQUE DIA A DIA", "total": 200.81, "faciais": 0.0, "pct": 0.0}, {"nome": "QUIOSQUE MATEUS FORQUILHA", "total": 999.98, "faciais": 0.0, "pct": 0.0}, {"nome": "QUIOSQUE TURU", "total": 1293.42, "faciais": 0.0, "pct": 0.0}, {"nome": "SANTA CRUZ", "total": 207.91, "faciais": 0.0, "pct": 0.0}, {"nome": "SANTA INÊS", "total": 7647.0, "faciais": 0.0, "pct": 0.0}, {"nome": "SANTA LUZIA DO PARUÁ", "total": 920.82, "faciais": 0.0, "pct": 0.0}, {"nome": "SANTA LUZIA DO TIDE", "total": 2497.62, "faciais": 0.0, "pct": 0.0}, {"nome": "SANTO ANTÔNIO", "total": 756.4, "faciais": 0.0, "pct": 0.0}, {"nome": "SHOPPING LUIZA MOTTA", "total": 3311.08, "faciais": 0.0, "pct": 0.0}, {"nome": "SHOPPING PASSEIO", "total": 1867.53, "faciais": 0.0, "pct": 0.0}, {"nome": "SHOPPING TROPICAL", "total": 5085.51, "faciais": 0.0, "pct": 0.0}, {"nome": "SUP.CIDADE/ALTERNATIVO", "total": 1286.62, "faciais": 0.0, "pct": 0.0}, {"nome": "SUPER FÁCIL SGA", "total": 1119.21, "faciais": 0.0, "pct": 0.0}, {"nome": "SUPERMERCADO CIDADE MOSSORÓ", "total": 0.05, "faciais": 0.0, "pct": 0.0}, {"nome": "SUPERMERCADO REBOUÇAS SÃO MANOEL", "total": 1327.67, "faciais": 0.0, "pct": 0.0}, {"nome": "SÃO GONÇALO CE", "total": 1437.03, "faciais": 0.0, "pct": 0.0}, {"nome": "SÃO JOSÉ DO CAMPESTRE", "total": 894.38, "faciais": 0.0, "pct": 0.0}, {"nome": "TIROL", "total": 3712.82, "faciais": 0.0, "pct": 0.0}, {"nome": "TRAIRI", "total": 3337.72, "faciais": 0.0, "pct": 0.0}, {"nome": "URUBURETAMA", "total": 276.77, "faciais": 0.0, "pct": 0.0}], "consultores": [{"nome": "CLAUDIA DIONISIO RODRIGUES", "total": 0.02, "faciais": 0.01, "pct": 50.0}, {"nome": "THASIA CRISTINA DA SILVA", "total": 1304.56, "faciais": 254.8, "pct": 19.53}, {"nome": "MIRIAN FERNANDA COSTA VIANA", "total": 1446.38, "faciais": 263.69, "pct": 18.23}, {"nome": "HORTENCIA DE SOUZA DANTAS", "total": 804.16, "faciais": 145.52, "pct": 18.1}, {"nome": "THAIS ARAUJO SILVEIRA", "total": 2556.32, "faciais": 367.06, "pct": 14.36}, {"nome": "DANIELA XAVIER DA FONSECA", "total": 1611.6, "faciais": 208.8, "pct": 12.96}, {"nome": "LUCIANA FERREIRA DA SILVA", "total": 1954.8, "faciais": 233.04, "pct": 11.92}, {"nome": "MARIA MAYANA FERREIRA DO NASCIMENTO", "total": 642.6, "faciais": 74.9, "pct": 11.66}, {"nome": "JOSIANE NASCIMENTO PRADO", "total": 2341.89, "faciais": 242.36, "pct": 10.35}, {"nome": "VALERIA CRISTINA DE OLIVEIRA ALMEIDA", "total": 2237.82, "faciais": 229.81, "pct": 10.27}, {"nome": "FERNANDA FERREIRA DE ARAUJO", "total": 914.71, "faciais": 88.46, "pct": 9.67}, {"nome": "AMANDA BEATRIZ SILVA DOS SANTOS", "total": 930.32, "faciais": 89.9, "pct": 9.66}, {"nome": "TAYANARA COSTA DOS REIS", "total": 3461.46, "faciais": 299.6, "pct": 8.66}, {"nome": "LUCIELE DE JESUS PINHEIRO PENHA", "total": 835.15, "faciais": 68.59, "pct": 8.21}, {"nome": "RAFAELE DE SOUSA DE OLIVEIRA CARVALHO", "total": 3322.72, "faciais": 261.09, "pct": 7.86}, {"nome": "MARLA TEREZA PONTES MARTINS", "total": 5695.8, "faciais": 419.78, "pct": 7.37}, {"nome": "DAICIANA BATISTA TAVARES DOS SANTOS", "total": 2555.96, "faciais": 169.95, "pct": 6.65}, {"nome": "MICHELY ROBERTA FELICIANO SILVA", "total": 2302.98, "faciais": 153.07, "pct": 6.65}, {"nome": "ANDRESSA MYCHELLE NOGUEIRA MARTINS", "total": 852.45, "faciais": 56.61, "pct": 6.64}, {"nome": "HILANE MARIA GOMES DE SOUZA", "total": 2147.27, "faciais": 109.77, "pct": 5.11}, {"nome": "CLEONICE CARVALHO RODRIGUES", "total": 2740.84, "faciais": 135.7, "pct": 4.95}, {"nome": "MARIA LAURA DA SILVA REGIS", "total": 1020.94, "faciais": 47.9, "pct": 4.69}, {"nome": "MARCIA MARIA DA SILVA GREGORIO", "total": 3194.35, "faciais": 135.4, "pct": 4.24}, {"nome": "THALITA RODRIGUES DA SILVA", "total": 2620.1, "faciais": 110.8, "pct": 4.23}, {"nome": "JOSE ROGERIO DIAS DE SOUZA FILHO", "total": 1678.12, "faciais": 67.9, "pct": 4.05}, {"nome": "JORDANA KELLY DE OLIVEIRA", "total": 1450.74, "faciais": 56.61, "pct": 3.9}, {"nome": "DHYOVANNA KELLY SILVA MENDES", "total": 3569.42, "faciais": 134.92, "pct": 3.78}, {"nome": "MAYARA CRISTINA MARTINS SEREJO", "total": 2282.85, "faciais": 85.84, "pct": 3.76}, {"nome": "DARLIANE NASCIMENTO DE CASTRO", "total": 1293.36, "faciais": 47.9, "pct": 3.7}, {"nome": "LUCIANA MENDES DO CARMO", "total": 2208.05, "faciais": 65.52, "pct": 2.97}, {"nome": "JAIARA FERNANDA ARAUJO", "total": 2647.55, "faciais": 62.9, "pct": 2.38}, {"nome": "JOANDERSON COSTA CAMARA", "total": 1982.79, "faciais": 44.04, "pct": 2.22}, {"nome": "VICTORIA KAROLINE GOMES DE OLIVEIRA SILVA", "total": 3534.06, "faciais": 74.9, "pct": 2.12}, {"nome": "INGRID LIMA DE OLIVEIRA", "total": 2164.32, "faciais": 41.36, "pct": 1.91}, {"nome": "JARDILENE RODRIGUES MOREIRA", "total": 2525.95, "faciais": 42.9, "pct": 1.7}, {"nome": "DAIANA SHARLA FERREIRA RAMOS", "total": 3204.44, "faciais": 47.43, "pct": 1.48}, {"nome": "VALZIELE BLENDA DA SILVA RAMOS", "total": 3486.53, "faciais": 49.9, "pct": 1.43}, {"nome": "ADRIANE SA SILVA", "total": 3553.83, "faciais": 48.76, "pct": 1.37}, {"nome": "JHONATAN FERREIRA DA SILVA", "total": 3437.04, "faciais": 46.71, "pct": 1.36}, {"nome": "GECIELE MACEDO DA SILVA", "total": 8968.97, "faciais": 118.46, "pct": 1.32}, {"nome": "EVERLANIA RAMOS DE LIMA", "total": 4024.86, "faciais": 42.9, "pct": 1.07}, {"nome": "ADRIANA LIMA SILVA", "total": 2022.48, "faciais": 0.0, "pct": 0.0}, {"nome": "ALESSANDRA LIMA DE SOUSA", "total": 945.83, "faciais": 0.0, "pct": 0.0}, {"nome": "ALESSANDRO DOS SANTOS", "total": 3411.85, "faciais": 0.0, "pct": 0.0}, {"nome": "ALICE LOREN FERREIRA DE SOUSA", "total": 504.81, "faciais": 0.0, "pct": 0.0}, {"nome": "ALINE DOS SANTOS FERNANDES", "total": 119.91, "faciais": 0.0, "pct": 0.0}, {"nome": "AMANDA CAROLINA ARAJO SILVA", "total": 664.93, "faciais": 0.0, "pct": 0.0}, {"nome": "AMANDA DOS SANTOS SOUZA", "total": 178.82, "faciais": 0.0, "pct": 0.0}, {"nome": "AMANDA MORENO FERREIRA", "total": 171.08, "faciais": 0.0, "pct": 0.0}, {"nome": "AMANDA PRISCILA COSTA SILVA", "total": 1156.2, "faciais": 0.0, "pct": 0.0}, {"nome": "ANA BEATRIZ DOS SANTOS NASCIMENTO", "total": 67.9, "faciais": 0.0, "pct": 0.0}, {"nome": "ANA CLAUDIA DA SILVA RODRIGUES", "total": 1020.99, "faciais": 0.0, "pct": 0.0}, {"nome": "ANA CRISTINA SALVIANO DO NASCIMENTO", "total": 799.3, "faciais": 0.0, "pct": 0.0}, {"nome": "ANA KELMA BRANCO CUTRIM", "total": 1627.43, "faciais": 0.0, "pct": 0.0}, {"nome": "ANA PAULA ALMEIDA", "total": 1857.71, "faciais": 0.0, "pct": 0.0}, {"nome": "ANA PAULA SOUSA PEREIRA", "total": 319.06, "faciais": 0.0, "pct": 0.0}, {"nome": "ANAYLA DAS NEVES SOUZA", "total": 1674.03, "faciais": 0.0, "pct": 0.0}, {"nome": "ANILEIDE PASSOS MENEZES", "total": 516.17, "faciais": 0.0, "pct": 0.0}, {"nome": "ANTONIELE ALVES PESSOA", "total": 524.21, "faciais": 0.0, "pct": 0.0}, {"nome": "ARTHUR NERES ALVES LOPES", "total": 1514.48, "faciais": 0.0, "pct": 0.0}, {"nome": "ARYANNE CUNHA CAVALCANTE", "total": 399.34, "faciais": 0.0, "pct": 0.0}, {"nome": "BRENDA OLIVEIRA COSTA", "total": 168.78, "faciais": 0.0, "pct": 0.0}, {"nome": "BRENDA THAINARA AMANCIO SOUSA", "total": 1451.17, "faciais": 0.0, "pct": 0.0}, {"nome": "BRUNA MAIARA FERREIRA DA SILVA DUARTE BARBOSA", "total": 198.8, "faciais": 0.0, "pct": 0.0}, {"nome": "CAMILA REIS NASCIMENTO", "total": 1867.53, "faciais": 0.0, "pct": 0.0}, {"nome": "CARLA NUNES ROSA FERNANDES", "total": 2548.24, "faciais": 0.0, "pct": 0.0}, {"nome": "CARMELA SOUSA MATOS", "total": 241.5, "faciais": 0.0, "pct": 0.0}, {"nome": "CLEBIA MORGANA DE MACEDO", "total": 1741.85, "faciais": 0.0, "pct": 0.0}, {"nome": "CRISTIANE XAVIER DE LIMA", "total": 511.25, "faciais": 0.0, "pct": 0.0}, {"nome": "DANIEL CARDOSO DE FREITAS", "total": 896.46, "faciais": 0.0, "pct": 0.0}, {"nome": "DANILO MAURICIO DOS SANTOS", "total": 687.94, "faciais": 0.0, "pct": 0.0}, {"nome": "DENIZE RICARTE DA SILVA", "total": 559.78, "faciais": 0.0, "pct": 0.0}, {"nome": "EDIANA NUNES MOURA GONCALVES", "total": 375.0, "faciais": 0.0, "pct": 0.0}, {"nome": "EDINEUMA PIRES DA SILVA", "total": 2999.82, "faciais": 0.0, "pct": 0.0}, {"nome": "EDIVANIA GARCIA DA SILVA LUCENA", "total": 2301.32, "faciais": 0.0, "pct": 0.0}, {"nome": "ELANIA DOS SANTOS OLIVEIRA", "total": 1080.51, "faciais": 0.0, "pct": 0.0}, {"nome": "ELIANE BESERRA MOTA", "total": 1278.81, "faciais": 0.0, "pct": 0.0}, {"nome": "ELIANE DE OLIVEIRA SOUSA", "total": 528.96, "faciais": 0.0, "pct": 0.0}, {"nome": "ELINA LIMA GUILHERME DA SILVA", "total": 2160.25, "faciais": 0.0, "pct": 0.0}, {"nome": "ELISANGELA NOGUEIRA DA SILVA", "total": 1696.6, "faciais": 0.0, "pct": 0.0}, {"nome": "ELIZABETE SIMAO DE LIMA CASTRO", "total": 0.03, "faciais": 0.0, "pct": 0.0}, {"nome": "EMILLY RAIANE ALVES DA SILVA", "total": 999.98, "faciais": 0.0, "pct": 0.0}, {"nome": "ERICK LUCAS DE ARAUJO SILVA", "total": 289.76, "faciais": 0.0, "pct": 0.0}, {"nome": "EVANDERSON TEIXEIRA RODRIGUES", "total": 144.12, "faciais": 0.0, "pct": 0.0}, {"nome": "Edson Mendonça Costa", "total": 2027.05, "faciais": 0.0, "pct": 0.0}, {"nome": "Evelane Ferreira do Nascimento Aguiar", "total": 444.74, "faciais": 0.0, "pct": 0.0}, {"nome": "FABIANA FERREIRA DA SILVA", "total": 1384.02, "faciais": 0.0, "pct": 0.0}, {"nome": "FERNANDA CHARLA RODRIGUES", "total": 1052.28, "faciais": 0.0, "pct": 0.0}, {"nome": "FERNANDA DANIELE ALVES MACIEL", "total": 187.6, "faciais": 0.0, "pct": 0.0}, {"nome": "FERNANDA MARINHOS PINTO ROCHA", "total": 1170.5, "faciais": 0.0, "pct": 0.0}, {"nome": "FLAVIA BIANCA DINIZ GOUVEIA", "total": 1797.61, "faciais": 0.0, "pct": 0.0}, {"nome": "FLAVIANA GUEDES DA SILVEIRA", "total": 1477.64, "faciais": 0.0, "pct": 0.0}, {"nome": "FRANCISCA SOLIANE DOS RESES", "total": 4260.03, "faciais": 0.0, "pct": 0.0}, {"nome": "FRANCISCO ALVES DA SILVA JUNIOR", "total": 2344.08, "faciais": 0.0, "pct": 0.0}, {"nome": "FRANCISCO MEDEIROS JÚNIOR", "total": 80.0, "faciais": 0.0, "pct": 0.0}, {"nome": "FRANCISCO ROBERTO SOUSA DO NASCIMENTO", "total": 344.74, "faciais": 0.0, "pct": 0.0}, {"nome": "GABRIEL ABREU PEREIRA", "total": 2998.1, "faciais": 0.0, "pct": 0.0}, {"nome": "GABRIELA MARQUES DE OLIVEIRA", "total": 89.9, "faciais": 0.0, "pct": 0.0}, {"nome": "GESSYCA ADRYELLY ARAUJO DA SILVA FONSECA", "total": 2117.61, "faciais": 0.0, "pct": 0.0}, {"nome": "GEYCIELLY DE SOUSA SOARES", "total": 534.53, "faciais": 0.0, "pct": 0.0}, {"nome": "GRECE KELLY BARBOSA CABRAL", "total": 1009.93, "faciais": 0.0, "pct": 0.0}, {"nome": "GUILHERMINA DA SILVA MELO", "total": 1400.82, "faciais": 0.0, "pct": 0.0}, {"nome": "HELEN EMANUELE ALVES RIBEIRO", "total": 119.31, "faciais": 0.0, "pct": 0.0}, {"nome": "HELLEN DE SOUSA OLIVEIRA", "total": 467.07, "faciais": 0.0, "pct": 0.0}, {"nome": "HELOISE VICTORIA QUEIROZ MARTINS", "total": 1327.67, "faciais": 0.0, "pct": 0.0}, {"nome": "HERICA MARIA FREITAS DE OLIVEIRA MARQUES", "total": 723.46, "faciais": 0.0, "pct": 0.0}, {"nome": "HILDENE SHUANNA OLIVEIRA CARVALHO", "total": 1435.06, "faciais": 0.0, "pct": 0.0}, {"nome": "ISABEL LUIZA RANGEL SANTOS", "total": 2497.62, "faciais": 0.0, "pct": 0.0}, {"nome": "ISABELA DA SILVA FREIRE DE MELO", "total": 164.91, "faciais": 0.0, "pct": 0.0}, {"nome": "ISABELA SILVA CASTRO DE SOUSA", "total": 1513.23, "faciais": 0.0, "pct": 0.0}, {"nome": "IVAN MARTINS DO VALE JUNIOR", "total": 521.08, "faciais": 0.0, "pct": 0.0}, {"nome": "IVANALDO CARDOSO DA SILVA", "total": 612.43, "faciais": 0.0, "pct": 0.0}, {"nome": "JAMILA DANTAS DOS SANTOS SILVA", "total": 340.35, "faciais": 0.0, "pct": 0.0}, {"nome": "JAMILLY DO NASCIMENTO BEZERRA", "total": 140.01, "faciais": 0.0, "pct": 0.0}, {"nome": "JANIELE DO BONFIM OLIVEIRA", "total": 357.12, "faciais": 0.0, "pct": 0.0}, {"nome": "JEFFERSON DE ASSIS COSTA", "total": 2386.71, "faciais": 0.0, "pct": 0.0}, {"nome": "JEIZEONARA BEZERRA DOS SANTOS TAVARES", "total": 1078.97, "faciais": 0.0, "pct": 0.0}, {"nome": "JENYFFER EMILYN TAVARES DA SILVA", "total": 319.91, "faciais": 0.0, "pct": 0.0}, {"nome": "JOAO SEBASTIAO GOMES DA SILVA NETO", "total": 703.98, "faciais": 0.0, "pct": 0.0}, {"nome": "JOICE ISLAINE NOGUEIRA DA COSTA", "total": 566.4, "faciais": 0.0, "pct": 0.0}, {"nome": "JORDANA DE FREITAS FERNANDES DANTAS", "total": 398.23, "faciais": 0.0, "pct": 0.0}, {"nome": "JOSELMA ANDRADE BARROS", "total": 855.8, "faciais": 0.0, "pct": 0.0}, {"nome": "JOYCE MARIA DE CARVALHO COSTA", "total": 459.73, "faciais": 0.0, "pct": 0.0}, {"nome": "JOYCE MARIENNY FERREIRA DE LIMA", "total": 155.0, "faciais": 0.0, "pct": 0.0}, {"nome": "JULIANA KARLETY DE LIMA COSTA", "total": 109.8, "faciais": 0.0, "pct": 0.0}, {"nome": "KAMILA MARIA GOMES ALVES", "total": 920.82, "faciais": 0.0, "pct": 0.0}, {"nome": "KARINE ARAUJO SOUSA", "total": 549.86, "faciais": 0.0, "pct": 0.0}, {"nome": "KAROLINE DA SILVA OLIVEIRA", "total": 1491.57, "faciais": 0.0, "pct": 0.0}, {"nome": "KELLY DOMINGOS DA SILVA", "total": 290.13, "faciais": 0.0, "pct": 0.0}, {"nome": "KETLYN NAYANE DA SILVA FREITAS", "total": 463.69, "faciais": 0.0, "pct": 0.0}, {"nome": "KEYLA WILMA GOMES DE PAIVA CHIANCA", "total": 908.6, "faciais": 0.0, "pct": 0.0}, {"nome": "KLIVIA MARYNA PINTO MIRANDA", "total": 79.9, "faciais": 0.0, "pct": 0.0}, {"nome": "Karolayne Maria de Lima Francisco", "total": 646.96, "faciais": 0.0, "pct": 0.0}, {"nome": "LARA FABIAN SANTOS FERREIRA DE SOUSA", "total": 222.67, "faciais": 0.0, "pct": 0.0}, {"nome": "LARISSA ALINE ALENCAR PAIVA", "total": 189.5, "faciais": 0.0, "pct": 0.0}, {"nome": "LETICIA DOS SANTOS BARROS", "total": 1285.26, "faciais": 0.0, "pct": 0.0}, {"nome": "LETICIA LIAR FRAZAO", "total": 1233.62, "faciais": 0.0, "pct": 0.0}, {"nome": "LIDIANE LIMA DA SILVA AMORIM", "total": 466.82, "faciais": 0.0, "pct": 0.0}, {"nome": "LILIAN FRANCA FIGUEIREDO", "total": 165.7, "faciais": 0.0, "pct": 0.0}, {"nome": "LISA KETHELYN DE MEDEIROS DIAS", "total": 543.3, "faciais": 0.0, "pct": 0.0}, {"nome": "LUANA SANTIAGO DANTAS", "total": 2822.97, "faciais": 0.0, "pct": 0.0}, {"nome": "LUANNA PRISCYLLA CARNEIRO DA SILVA", "total": 200.81, "faciais": 0.0, "pct": 0.0}, {"nome": "LUCICLEIDE MATIAS DA SILVA", "total": 459.6, "faciais": 0.0, "pct": 0.0}, {"nome": "LUCILIA LUCENA DE CARVALHO", "total": 248.18, "faciais": 0.0, "pct": 0.0}, {"nome": "LUIZ FELIPE ANGELO MOREIRA", "total": 184.91, "faciais": 0.0, "pct": 0.0}, {"nome": "MAIRLA CRUZ DE JESUS DA SILVA", "total": 686.8, "faciais": 0.0, "pct": 0.0}, {"nome": "MARCELA GOMES DA SILVA LIMA", "total": 1011.99, "faciais": 0.0, "pct": 0.0}, {"nome": "MARCELO SANTOS DE MEDEIROS", "total": 38.91, "faciais": 0.0, "pct": 0.0}, {"nome": "MARIA ADRIANA DE LIMA SA", "total": 0.05, "faciais": 0.0, "pct": 0.0}, {"nome": "MARIA ALINE FERREIRA ALVES", "total": 739.38, "faciais": 0.0, "pct": 0.0}, {"nome": "MARIA ANDREZA SILVA DE OLIVEIRA", "total": 861.98, "faciais": 0.0, "pct": 0.0}, {"nome": "MARIA DANDARA SILVA BASILIO FONTELES", "total": 779.66, "faciais": 0.0, "pct": 0.0}, {"nome": "MARIA DO CARMO DOS SANTOS", "total": 3422.69, "faciais": 0.0, "pct": 0.0}, {"nome": "MARIA DO CARMO SOUZA", "total": 250.42, "faciais": 0.0, "pct": 0.0}, {"nome": "MARIA EDUARDA GOMES ARAUJO FIGUEIREDO", "total": 92.91, "faciais": 0.0, "pct": 0.0}, {"nome": "MARIA ELIZABETE ALVES DA SILVA", "total": 1286.6, "faciais": 0.0, "pct": 0.0}, {"nome": "MARIA FERLANDIA ALBUQUERQUE BARROS PAIXAO", "total": 410.33, "faciais": 0.0, "pct": 0.0}, {"nome": "MARIA JAMILLY DE SOUZA BRAGA", "total": 1116.57, "faciais": 0.0, "pct": 0.0}, {"nome": "MARIA JOCINEIDE DE SOUSA MOURA", "total": 921.32, "faciais": 0.0, "pct": 0.0}, {"nome": "MARIA JOICIANE SILVA ALVES", "total": 276.77, "faciais": 0.0, "pct": 0.0}, {"nome": "MARIA KATIANY DE OLIVEIRA PRAXEDES", "total": 879.19, "faciais": 0.0, "pct": 0.0}, {"nome": "MARIA LUCITANIA GOMES DA SILVA", "total": 780.65, "faciais": 0.0, "pct": 0.0}, {"nome": "MARIA VALERIA MARINHO DE SOUSA", "total": 1038.4, "faciais": 0.0, "pct": 0.0}, {"nome": "MARIA VANESSA DE SOUSA SILVA", "total": 799.6, "faciais": 0.0, "pct": 0.0}, {"nome": "MARIANE ALVES CAMERINO", "total": 806.81, "faciais": 0.0, "pct": 0.0}, {"nome": "MAVERICK JEOVA REBOUCAS ALVES", "total": 0.02, "faciais": 0.0, "pct": 0.0}, {"nome": "MICHELLE CORREA DE CARVALHO", "total": 491.16, "faciais": 0.0, "pct": 0.0}, {"nome": "MICHELLYANE DE OLIVEIRA DANTAS TAVARES", "total": 1323.09, "faciais": 0.0, "pct": 0.0}, {"nome": "MIKAELLY GARCIA CASTRO", "total": 1724.76, "faciais": 0.0, "pct": 0.0}, {"nome": "MILEIDE PAIVA CARDOSO", "total": 2844.18, "faciais": 0.0, "pct": 0.0}, {"nome": "MILENA BARBOSA PORFIRIO DO NASCIMENTO", "total": 617.41, "faciais": 0.0, "pct": 0.0}, {"nome": "MIRTES TAVARES OLIVEIRA", "total": 1249.22, "faciais": 0.0, "pct": 0.0}, {"nome": "MONICA ELAINE SILVA SANTOS MARTINS", "total": 1370.18, "faciais": 0.0, "pct": 0.0}, {"nome": "NATALY DE JESUS", "total": 1293.42, "faciais": 0.0, "pct": 0.0}, {"nome": "NAYARA KELLE MENESES", "total": 3281.35, "faciais": 0.0, "pct": 0.0}, {"nome": "NICOLE KAROLINE DE JESUS", "total": 1001.38, "faciais": 0.0, "pct": 0.0}, {"nome": "PAMELA RAQUEL YONARRARA DA COSTA ALCANTARA", "total": 0.02, "faciais": 0.0, "pct": 0.0}, {"nome": "PAMELA VICTORIA FONSECA ARAUJO", "total": 2217.86, "faciais": 0.0, "pct": 0.0}, {"nome": "PATRICIA DA FONSECA DE SOUZA FREITAS", "total": 1023.34, "faciais": 0.0, "pct": 0.0}, {"nome": "PAULA YNGRID SANTOS DE OLIVEIRA BORGES", "total": 1221.4, "faciais": 0.0, "pct": 0.0}, {"nome": "PEDRO DANIEL DA SILVA QUEIROZ", "total": 601.33, "faciais": 0.0, "pct": 0.0}, {"nome": "PRISCILA MARACAJA DE SOUSA", "total": 1408.32, "faciais": 0.0, "pct": 0.0}, {"nome": "RABECH GOMES CARVALHO", "total": 796.14, "faciais": 0.0, "pct": 0.0}, {"nome": "RAFAELA DA SILVA SANTOS", "total": 1307.72, "faciais": 0.0, "pct": 0.0}, {"nome": "RAFAELA PRISCILA DANTAS GADELHA DE SOUZA", "total": 1863.99, "faciais": 0.0, "pct": 0.0}, {"nome": "RAFAELA RODRIGUES MONTEIRO", "total": 1967.56, "faciais": 0.0, "pct": 0.0}, {"nome": "RAIMUNDA NONATA RAPOSO DA SILVA", "total": 1961.57, "faciais": 0.0, "pct": 0.0}, {"nome": "RAISSA AMANCIO DE SALES", "total": 624.01, "faciais": 0.0, "pct": 0.0}, {"nome": "RAQUEL DAS NEVES BARROS FERREIRA SILVA", "total": 356.52, "faciais": 0.0, "pct": 0.0}, {"nome": "RAQUEL DE SOUSA PAULA", "total": 1410.51, "faciais": 0.0, "pct": 0.0}, {"nome": "RAYANNE WEYNNE PORTO COSTA", "total": 463.72, "faciais": 0.0, "pct": 0.0}, {"nome": "RAYDLEINE GOMES SILVA", "total": 63.94, "faciais": 0.0, "pct": 0.0}, {"nome": "REGIANE SILVA LIMA", "total": 2513.65, "faciais": 0.0, "pct": 0.0}, {"nome": "REIDIANE SANTOS DA SILVA", "total": 2228.26, "faciais": 0.0, "pct": 0.0}, {"nome": "RENARA CARDOSO DA SILVA", "total": 908.99, "faciais": 0.0, "pct": 0.0}, {"nome": "RENATA JESSICA TEIXEIRA SANTOS", "total": 507.81, "faciais": 0.0, "pct": 0.0}, {"nome": "RIBAMAR TARGINO DA SILVA", "total": 67.0, "faciais": 0.0, "pct": 0.0}, {"nome": "RIVALDO DE OLIVEIRA SILVA", "total": 942.97, "faciais": 0.0, "pct": 0.0}, {"nome": "ROSENILDE NUNES AGUIAR", "total": 1953.61, "faciais": 0.0, "pct": 0.0}, {"nome": "RUBERLENIA GOMES DE LIMA CRUZ", "total": 445.05, "faciais": 0.0, "pct": 0.0}, {"nome": "RUBINEIA COSTA CORREIA SILVA", "total": 221.41, "faciais": 0.0, "pct": 0.0}, {"nome": "SABRINA SANTOS RODRIGUES", "total": 374.63, "faciais": 0.0, "pct": 0.0}, {"nome": "SAMARA ALVES DO NASCIMENTO", "total": 345.04, "faciais": 0.0, "pct": 0.0}, {"nome": "SANARA LOPES TORRES", "total": 1521.02, "faciais": 0.0, "pct": 0.0}, {"nome": "SARA JUDITE DE FREITAS CAMPELO", "total": 60.84, "faciais": 0.0, "pct": 0.0}, {"nome": "SIMONE FERREIRA VARELA DA SILVA", "total": 1478.87, "faciais": 0.0, "pct": 0.0}, {"nome": "STEFANNY GOMES DE NEGREIROS", "total": 564.67, "faciais": 0.0, "pct": 0.0}, {"nome": "STEFANY NASCIMENTO SANTOS", "total": 283.81, "faciais": 0.0, "pct": 0.0}, {"nome": "SUZY NASCIMENTO PESSOA DE LUNA", "total": 160.95, "faciais": 0.0, "pct": 0.0}, {"nome": "SYMONNE DA SILVA VIANA", "total": 1631.77, "faciais": 0.0, "pct": 0.0}, {"nome": "TAMARA FERNANDA PINTO ROCHA", "total": 982.34, "faciais": 0.0, "pct": 0.0}, {"nome": "TAMARA VITORIA PEREIRA FIGUEIREDO", "total": 2350.1, "faciais": 0.0, "pct": 0.0}, {"nome": "THAMARA SILVA BARBOSA", "total": 407.95, "faciais": 0.0, "pct": 0.0}, {"nome": "THAYANNE GABRYELLE PIRES NASCIMENTO", "total": 207.61, "faciais": 0.0, "pct": 0.0}, {"nome": "THAYSA BARBOSA PINTO DE AGUIAR", "total": 577.13, "faciais": 0.0, "pct": 0.0}, {"nome": "VANESSA MARTINS FREIRE", "total": 1837.98, "faciais": 0.0, "pct": 0.0}, {"nome": "VITORIA CONCEICAO PORTELA MACEDO", "total": 2167.64, "faciais": 0.0, "pct": 0.0}, {"nome": "VITORIA MYLENA CRUZ GOMES PEREIRA", "total": 756.4, "faciais": 0.0, "pct": 0.0}, {"nome": "VIVIA FERREIRA RODRIGUES", "total": 4151.65, "faciais": 0.0, "pct": 0.0}, {"nome": "VIVIANE CRISTINA DA SILVA ANDRADE", "total": 115.8, "faciais": 0.0, "pct": 0.0}, {"nome": "WILMA GONCALVES DE LIMA", "total": 1445.06, "faciais": 0.0, "pct": 0.0}]};
+
+function fmt(n)  { return 'R$ ' + n.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.'); }
+function fmtPct(n) { return n.toFixed(2).replace('.',',') + '%'; }
+function pctClass(pct) { return pct >= D.meta ? 'pct-ok' : 'pct-no'; }
+function vsClass(vs)   { return vs >= 0 ? 'vs-ok' : 'vs-no'; }
+function statusBadge(pct) { return pct >= D.meta ? '<span class="badge-ok">&#10004; Atingiu</span>' : '<span class="badge-no">&#10008; Abaixo</span>'; }
+
+function bar(pct) {
+  const maxPct = 15;
+  const fill  = Math.min(pct / maxPct * 100, 100);
+  const meta  = Math.min(D.meta / maxPct * 100, 100);
+  const color = pct >= D.meta ? '#70AD47' : '#FF6B6B';
+  return `<div class="bar-wrap"><div class="bar-fill" style="width:${fill}%;background:${color}"></div><div class="bar-meta" style="left:${meta}%"></div></div>`;
+}
+
+function thead(cols) {
+  return '<thead><tr>' + cols.map(c => `<th>${c}</th>`).join('') + '</tr></thead>';
+}
+
+function buildFullTable(tbId, rows) {
+  const tb = document.getElementById(tbId);
+  const vs = r => (r.pct - D.meta).toFixed(2).replace('.',',');
+  const vsSign = r => r.pct >= D.meta ? '+' : '';
+  tb.innerHTML = thead(['#','Visão','Rec. Total','Rec. Faciais','% Faciais','','Meta','vs Meta','Status']);
+  const body = rows.map((r,i) => `<tr>
+    <td class="cen" style="color:#aaa;font-size:11px">${i+1}</td>
+    <td class="name">${r.nome}</td>
+    <td class="num">${fmt(r.total)}</td>
+    <td class="num">${fmt(r.faciais)}</td>
+    <td class="num ${pctClass(r.pct)}">${fmtPct(r.pct)}</td>
+    <td style="padding:7px 6px">${bar(r.pct)}</td>
+    <td class="cen" style="color:#888">${fmtPct(D.meta)}</td>
+    <td class="cen ${vsClass(r.pct - D.meta)}">${vsSign(r)}${vs(r)}%</td>
+    <td class="cen">${statusBadge(r.pct)}</td>
+  </tr>`).join('');
+  tb.innerHTML += '<tbody>' + body + '</tbody>';
+}
+
+function buildResumoTable(tbId, rows) {
+  const tb = document.getElementById(tbId);
+  tb.innerHTML = thead(['Visão','% Faciais','','Status']);
+  const body = rows.map(r => `<tr>
+    <td class="name">${r.nome}</td>
+    <td class="num ${pctClass(r.pct)}" style="width:80px">${fmtPct(r.pct)}</td>
+    <td style="padding:7px 6px">${bar(r.pct)}</td>
+    <td class="cen">${statusBadge(r.pct)}</td>
+  </tr>`).join('');
+  tb.innerHTML += '<tbody>' + body + '</tbody>';
+}
+
+function buildKPIs() {
+  const k = D.kpis;
+  const vs = (k.pctFacial - D.meta).toFixed(2);
+  const vsSign = k.pctFacial >= D.meta ? '+' : '';
+  const cards = [
+    {lbl:'Receita Total Loja',     val: fmt(k.totalRec),                   cls:''},
+    {lbl:'Receita Faciais',         val: fmt(k.facialRec),                  cls:''},
+    {lbl:'% Faciais (Real)',         val: fmtPct(k.pctFacial),               cls: k.pctFacial >= D.meta ? 'verde' : 'verm'},
+    {lbl:'Meta',                    val: fmtPct(D.meta),                    cls:''},
+    {lbl:'vs Meta',                 val: vsSign+vs+'%',                     cls: k.pctFacial >= D.meta ? 'verde' : 'verm'},
+    {lbl:'Lojas Acima da Meta',     val: k.lojasAcima+' / '+k.lojasTotal,  cls: k.lojasAcima/k.lojasTotal >= 0.5 ? 'verde' : 'laranj'},
+  ];
+  document.getElementById('kpi-grid').innerHTML = cards.map(c =>
+    `<div class="kpi-card ${c.cls}"><div class="kpi-val">${c.val}</div><div class="kpi-lbl">${c.lbl}</div></div>`
+  ).join('');
+}
+
+function filterTable(tbId, q) {
+  const rows = document.getElementById(tbId).querySelectorAll('tbody tr');
+  const lq = q.toLowerCase();
+  rows.forEach(r => {
+    r.style.display = r.cells[1].textContent.toLowerCase().includes(lq) ? '' : 'none';
+  });
+}
+
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  el.classList.add('active');
+}
+
+// ── Init ──
+document.getElementById('dataBase').textContent = D.dataBase;
+buildKPIs();
+buildResumoTable('tbl-praca-resumo',   D.pracas);
+buildResumoTable('tbl-gestor-resumo',  D.gestores);
+buildFullTable('tbl-pracas',      D.pracas);
+buildFullTable('tbl-gestores',    D.gestores);
+buildFullTable('tbl-lojas',       D.lojas);
+buildFullTable('tbl-consultores', D.consultores);
+
+document.getElementById('praca-count').textContent    = D.pracas.length    + ' praças';
+document.getElementById('gestor-count').textContent   = D.gestores.length  + ' gestores';
+document.getElementById('loja-count').textContent     = D.lojas.length     + ' lojas';
+document.getElementById('consultor-count').textContent= D.consultores.length+' consultores';
+</script>
+</body>
+</html>
